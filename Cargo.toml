@@ -1,0 +1,56 @@
+[package]
+name = "locksmith"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = [
+    "cdylib", # for Java Native Interface (JNI)
+    "lib", # for integration tests
+    "staticlib", # for C Foreign Function Interface (FFI) friends
+]
+name = "locksmith"
+
+[[bin]]
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
+required-features = ["bindgen-cli"]
+
+[features]
+default = []
+# CLI feature only needed for the uniffi-bindgen binary
+bindgen-cli = ["uniffi/cli"]
+# Enable this feature to build JavaScript/WebAssembly bindings
+js = ["wasm-bindgen", "js-sys"]
+
+[dependencies]
+# Async for async operations
+async-std = "1.13.2"
+fluent = "0.17.0"
+fluent-bundle = "0.16.0"
+fluent-langneg = "0.14.1"
+once_cell = "1.21.3"
+unic-langid = { version = "0.9.6", features = ["macros"] }
+# Remove CLI feature - not needed for library builds
+uniffi = { version = "0.29.4" }
+# JS/WASM only - not needed for iOS/Android
+wasm-bindgen = { version = "0.2", optional = true }
+js-sys = { version = "0.3", optional = true }
+
+[build-dependencies]
+uniffi = { version = "0.29.4", features = [ "build" ] }
+
+# Optimize for size
+[profile.release]
+opt-level = "z"        # Optimize for size
+lto = true             # Enable Link Time Optimization
+codegen-units = 1      # Better optimization with single codegen unit
+strip = true           # Strip symbols from binary
+panic = "abort"        # Reduce binary size by not including unwinding code
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false
+
+[package.metadata.wasm-pack.profile.dev]
+wasm-opt = false
+

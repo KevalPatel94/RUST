@@ -1,0 +1,12 @@
+namespace my_crate {};
+
+
+enum PasswordValidation {
+  "TooShort",
+  "TooLong",
+  "NoUppercase",
+  "NoLowercase",
+  "NoNumber",
+  "NoSymbol",
+  "Valid",
+};
