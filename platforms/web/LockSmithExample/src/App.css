@@ -1,0 +1,197 @@
+.app {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app-header {
+  margin-bottom: 2rem;
+}
+
+.app-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Locale Section */
+.locale-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.locale-label {
+  font-size: 0.875rem;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.locale-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.locale-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.locale-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.locale-button.active {
+  background-color: #2196F3;
+  border-color: #2196F3;
+  color: white;
+}
+
+@media (prefers-color-scheme: light) {
+  .locale-button {
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  .locale-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
+/* Password Section */
+.password-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.password-input-group {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.password-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.password-input:focus {
+  border-color: #2196F3;
+}
+
+@media (prefers-color-scheme: light) {
+  .password-input {
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  .password-input:focus {
+    border-color: #2196F3;
+  }
+}
+
+.toggle-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: #2196F3;
+  color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background-color 0.2s;
+}
+
+.toggle-button:hover {
+  background-color: #1976D2;
+}
+
+.validation-message {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.instructions {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin: 0;
+  text-align: center;
+}
+
+/* Samples Section */
+.samples-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.samples-header {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  text-align: left;
+}
+
+.samples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sample-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  background-color: #2196F3;
+  color: white;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.sample-button:hover {
+  background-color: #1976D2;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .app {
+    padding: 1rem;
+  }
+  
+  .password-input-group {
+    flex-direction: column;
+  }
+  
+  .toggle-button {
+    width: 100%;
+  }
+}
+

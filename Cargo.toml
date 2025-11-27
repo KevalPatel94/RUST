@@ -2,6 +2,9 @@
 name = "locksmith"
 version = "0.1.0"
 edition = "2024"
+description = "Cross-platform sample with a Rust core and bindings for Android, iOS, and Python (via UniFFI) and Web (via WASM)"
+license = "MIT"
+repository = "https://github.com/KevalPatel94/RUST"
 
 [lib]
 crate-type = [
