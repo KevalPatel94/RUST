@@ -165,7 +165,7 @@ final class ViewController: UIViewController {
         return stack
     }()
 
-    private let validator = LockSmith.PasswordValidator()
+    private let validator = PasswordValidator()
     private var sampleButtons: [SamplePassword: UIButton] = [:]
 
     override func viewDidLoad() {
@@ -196,10 +196,10 @@ final class ViewController: UIViewController {
     private func applyLocalization() {
         let greeting = getRustDemoTitle(name: "iOS")
         titleLabel.text = greeting
-        localeLabel.text = LockSmith.getLocalizedText(key: "locale-picker-label")
-        passwordField.placeholder = LockSmith.getLocalizedText(key: "password-input-placeholder")
-        instructionsLabel.text = LockSmith.getLocalizedText(key: "password-instructions")
-        samplesLabel.text = LockSmith.getLocalizedText(key: "password-sample-header")
+        localeLabel.text = getLocalizedText(key: "locale-picker-label")
+        passwordField.placeholder = getLocalizedText(key: "password-input-placeholder")
+        instructionsLabel.text = getLocalizedText(key: "password-instructions")
+        samplesLabel.text = getLocalizedText(key: "password-sample-header")
         updatePasswordToggleTitle()
         updateSampleButtons()
         updateValidationMessage(with: passwordField.text ?? "")
@@ -214,19 +214,19 @@ final class ViewController: UIViewController {
             return
         }
 
-        let successText = LockSmith.getLocalizedText(key: "password-valid")
+        let successText = getLocalizedText(key: "password-valid")
         validationLabel.textColor = (message == successText) ? .systemGreen : .systemRed
     }
 
     private func updatePasswordToggleTitle() {
         let key = passwordField.isSecureTextEntry ? "password-toggle-show" : "password-toggle-hide"
-        let title = LockSmith.getLocalizedText(key: key)
+        let title = getLocalizedText(key: key)
         showPasswordButton.setTitle(title, for: .normal)
     }
 
     private func updateSampleButtons() {
         SamplePassword.allCases.forEach { sample in
-            let title = "• " + LockSmith.getLocalizedText(key: sample.localizationKey)
+            let title = "• " + getLocalizedText(key: sample.localizationKey)
             sampleButtons[sample]?.setTitle(title, for: .normal)
         }
     }

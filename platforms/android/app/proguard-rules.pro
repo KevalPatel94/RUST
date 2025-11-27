@@ -5,3 +5,5 @@
 # Keep LockSmith bindings
 -keep class uniffi.locksmith.** { *; }
 
+
+
