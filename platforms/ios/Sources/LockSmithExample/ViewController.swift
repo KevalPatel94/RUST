@@ -256,7 +256,7 @@ final class ViewController: UIViewController {
         guard let option = LocaleOption(rawValue: sender.selectedSegmentIndex) else {
             return
         }
-        LockSmith.setAppLocale(locale: option.code)
+        setAppLocale(locale: option.code)
         applyLocalization()
     }
 }

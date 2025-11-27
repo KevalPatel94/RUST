@@ -3,3 +3,17 @@
 *.xcuserdatad
 xcuserdata/
 target/
+
+# Android build artifacts
+platforms/android/.gradle/
+platforms/android/.idea/
+platforms/android/build/
+platforms/android/*/build/
+platforms/android/local.properties
+platforms/android/.gradle
+platforms/android/.idea
+platforms/android/*.iml
+platforms/android/.cxx/
+platforms/android/*.apk
+platforms/android/*.ap_
+platforms/android/*.aab

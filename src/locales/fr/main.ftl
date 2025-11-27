@@ -22,4 +22,3 @@ password-sample-no-number = Manque un chiffre
 password-sample-no-symbol = Manque un symbole
 password-sample-valid = Mot de passe totalement valide
 
-

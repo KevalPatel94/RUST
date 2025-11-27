@@ -22,4 +22,3 @@ password-sample-no-number = Falta un numero
 password-sample-no-symbol = Falta un simbolo
 password-sample-valid = Contrasena totalmente valida
 
-

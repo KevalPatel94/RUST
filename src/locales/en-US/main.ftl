@@ -22,4 +22,3 @@ password-sample-no-number = Missing number
 password-sample-no-symbol = Missing symbol
 password-sample-valid = Fully valid password
 
-

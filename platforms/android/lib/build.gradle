@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'uniffi.locksmith'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 24
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    
+    sourceSets {
+        main {
+            java.srcDirs = ['src/main/kotlin']
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+}
+
+dependencies {
+    implementation 'net.java.dev.jna:jna:5.13.0@aar'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+}
