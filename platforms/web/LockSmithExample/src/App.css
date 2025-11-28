@@ -180,6 +180,51 @@
   background-color: #1976D2;
 }
 
+.benchmark-link-button {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.benchmark-link-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.back-button {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.375rem;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.back-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .benchmark-link-button,
+  .back-button {
+    border-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  .benchmark-link-button:hover,
+  .back-button:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .app {

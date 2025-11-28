@@ -757,6 +757,8 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 
 
 
+
+
 // For large crates we prevent `MethodTooLargeException` (see #2340)
 // N.B. the name of the extension is very misleading, since it is 
 // rather `InterfaceTooLargeException`, caused by too many methods 
@@ -801,6 +803,8 @@ fun uniffi_locksmith_checksum_method_passwordvalidator_say_after(
 fun uniffi_locksmith_checksum_method_passwordvalidator_validate(
 ): Short
 fun uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized(
+): Short
+fun uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid(
 ): Short
 fun uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated(
 ): Short
@@ -871,6 +875,8 @@ fun uniffi_locksmith_fn_method_passwordvalidator_validate(`ptr`: Pointer,`passwo
 ): RustBuffer.ByValue
 fun uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(`ptr`: Pointer,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+fun uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(`ptr`: Pointer,`inputs`: RustBuffer.ByValue,`rounds`: Int,uniffi_out_err: UniffiRustCallStatus, 
+): Long
 fun uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated(`ptr`: Pointer,`inputs`: RustBuffer.ByValue,`rounds`: Int,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 fun uniffi_locksmith_fn_method_passwordvalidator_validate_with_message(`ptr`: Pointer,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1066,6 +1072,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized() != 46553.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid() != 56050.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated() != 45591.toShort()) {
@@ -1476,6 +1485,8 @@ public interface PasswordValidatorInterface {
     
     fun `validatePasswordMessageNonLocalized`(`password`: kotlin.String): kotlin.String
     
+    fun `validatePasswordsCountValid`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong
+    
     fun `validatePasswordsScoreRepeated`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong
     
     fun `validateWithMessage`(`password`: kotlin.String): kotlin.String
@@ -1626,6 +1637,18 @@ open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterf
     uniffiRustCall() { _status ->
     UniffiLib.INSTANCE.uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(
         it, FfiConverterString.lower(`password`),_status)
+}
+    }
+    )
+    }
+    
+
+    override fun `validatePasswordsCountValid`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong {
+            return FfiConverterULong.lift(
+    callWithPointer {
+    uniffiRustCall() { _status ->
+    UniffiLib.INSTANCE.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(
+        it, FfiConverterSequenceString.lower(`inputs`),FfiConverterUInt.lower(`rounds`),_status)
 }
     }
     )

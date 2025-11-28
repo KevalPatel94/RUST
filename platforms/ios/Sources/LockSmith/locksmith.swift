@@ -487,6 +487,8 @@ public protocol PasswordValidatorProtocol: AnyObject, Sendable {
     
     func validatePasswordMessageNonLocalized(password: String)  -> String
     
+    func validatePasswordsCountValid(inputs: [String], rounds: UInt32)  -> UInt64
+    
     func validatePasswordsScoreRepeated(inputs: [String], rounds: UInt32)  -> UInt64
     
     func validateWithMessage(password: String)  -> String
@@ -593,6 +595,15 @@ open func validatePasswordMessageNonLocalized(password: String) -> String  {
     return try!  FfiConverterString.lift(try! rustCall() {
     uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(self.uniffiClonePointer(),
         FfiConverterString.lower(password),$0
+    )
+})
+}
+    
+open func validatePasswordsCountValid(inputs: [String], rounds: UInt32) -> UInt64  {
+    return try!  FfiConverterUInt64.lift(try! rustCall() {
+    uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(self.uniffiClonePointer(),
+        FfiConverterSequenceString.lower(inputs),
+        FfiConverterUInt32.lower(rounds),$0
     )
 })
 }
@@ -1003,6 +1014,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized() != 46553) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid() != 56050) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated() != 45591) {

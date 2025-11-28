@@ -491,6 +491,8 @@ def _uniffi_check_api_checksums(lib):
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized() != 46553:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid() != 56050:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated() != 45591:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_with_message() != 63839:
@@ -641,6 +643,13 @@ _UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_password_messag
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid.argtypes = (
+    ctypes.c_void_p,
+    _UniffiRustBuffer,
+    ctypes.c_uint32,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid.restype = ctypes.c_uint64
 _UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated.argtypes = (
     ctypes.c_void_p,
     _UniffiRustBuffer,
@@ -1023,6 +1032,9 @@ _UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate.restype =
 _UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized.argtypes = (
 )
 _UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized.restype = ctypes.c_uint16
+_UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid.argtypes = (
+)
+_UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid.restype = ctypes.c_uint16
 _UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated.argtypes = (
 )
 _UniffiLib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated.restype = ctypes.c_uint16
@@ -1253,6 +1265,8 @@ class PasswordValidatorProtocol(typing.Protocol):
         raise NotImplementedError
     def validate_password_message_non_localized(self, password: "str"):
         raise NotImplementedError
+    def validate_passwords_count_valid(self, inputs: "typing.List[str]",rounds: "int"):
+        raise NotImplementedError
     def validate_passwords_score_repeated(self, inputs: "typing.List[str]",rounds: "int"):
         raise NotImplementedError
     def validate_with_message(self, password: "str"):
@@ -1342,6 +1356,21 @@ class PasswordValidator():
         return _UniffiConverterString.lift(
             _uniffi_rust_call(_UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized,self._uniffi_clone_pointer(),
         _UniffiConverterString.lower(password))
+        )
+
+
+
+
+
+    def validate_passwords_count_valid(self, inputs: "typing.List[str]",rounds: "int") -> "int":
+        _UniffiConverterSequenceString.check_lower(inputs)
+        
+        _UniffiConverterUInt32.check_lower(rounds)
+        
+        return _UniffiConverterUInt64.lift(
+            _uniffi_rust_call(_UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid,self._uniffi_clone_pointer(),
+        _UniffiConverterSequenceString.lower(inputs),
+        _UniffiConverterUInt32.lower(rounds))
         )
 
 

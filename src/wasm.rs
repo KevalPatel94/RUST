@@ -69,6 +69,18 @@ mod wasm_bindings {
             }
             self.inner.validate_passwords_score_repeated(vec_inputs, rounds)
         }
+
+        /// Batch validation that counts valid passwords over N rounds.
+        #[wasm_bindgen]
+        pub fn validate_passwords_count_valid(&self, inputs: Array, rounds: u32) -> u64 {
+            let mut vec_inputs: Vec<String> = Vec::with_capacity(inputs.length() as usize);
+            for v in inputs.iter() {
+                if let Some(s) = v.as_string() {
+                    vec_inputs.push(s);
+                }
+            }
+            self.inner.validate_passwords_count_valid(vec_inputs, rounds)
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import {
   get_translated_text, 
   get_rust_demo_title 
 } from 'locksmith'
+import Benchmark from './Benchmark'
 import './App.css'
 
 type LocaleOption = {
@@ -37,6 +38,7 @@ const SAMPLE_PASSWORDS: SamplePassword[] = [
 function App() {
   console.log('App component rendering...')
   const [wasmLoaded, setWasmLoaded] = useState(false)
+  const [showBenchmark, setShowBenchmark] = useState(false)
   const [validator, setValidator] = useState<WasmPasswordValidator | null>(null)
   const [password, setPassword] = useState('')
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -137,6 +139,20 @@ function App() {
     )
   }
 
+  if (showBenchmark) {
+    return (
+      <div className="app">
+        <button
+          onClick={() => setShowBenchmark(false)}
+          className="back-button"
+        >
+          ← Back to Password Validator
+        </button>
+        <Benchmark />
+      </div>
+    )
+  }
+
   // Get title safely
   let title = 'LockSmith'
   try {
@@ -152,6 +168,14 @@ function App() {
       </header>
 
       <main className="app-main">
+        {/* Benchmark Button */}
+        <button
+          onClick={() => setShowBenchmark(true)}
+          className="benchmark-link-button"
+        >
+          Run Benchmark
+        </button>
+
         {/* Locale Selector */}
         <div className="locale-section">
           <p className="locale-label">{localizedTexts['locale-picker-label']}</p>

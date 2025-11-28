@@ -75,6 +75,26 @@ targets:
         - package: LockSmith/LockSmithTests
           parallelizable: true
           randomExecutionOrder: true
+  LockSmithExampleTests:
+    type: bundle.unit-test
+    platform: iOS
+    dependencies:
+      - target: LockSmithExample
+      - package: LockSmith
+        product: Calculator
+    sources:
+      - path: Tests/LockSmithExampleTests
+    info:
+      path: "Tests/LockSmithExampleTests/Resources/Info.plist"
+      properties:
+        CFBundleDevelopmentRegion: $(DEVELOPMENT_LANGUAGE)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleInfoDictionaryVersion: 6.0
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: $(PRODUCT_BUNDLE_PACKAGE_TYPE)
+        CFBundleShortVersionString: 1.0
+        CFBundleVersion: 1
   LockSmithExampleUITests:
     type: bundle.ui-testing
     platform: iOS

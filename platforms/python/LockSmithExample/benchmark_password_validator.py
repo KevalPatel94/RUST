@@ -51,12 +51,28 @@ def benchmark_python(passwords: List[str], rounds: int) -> tuple[float, int]:
     return elapsed_ns, total_valid
 
 
-def benchmark_rust(passwords: List[str], rounds: int) -> tuple[float, int]:
-    """Benchmark Rust validation via FFI"""
+def benchmark_rust_batch(passwords: List[str], rounds: int) -> tuple[float, int]:
+    """Benchmark Rust batch validation (Rust does 10,000 rounds internally)"""
     validator = locksmith.PasswordValidator()
     
     start = time.perf_counter_ns()
-    total_valid = validator.validate_passwords_score_repeated(passwords, rounds)
+    total_valid = validator.validate_passwords_count_valid(passwords, rounds)
+    end = time.perf_counter_ns()
+    elapsed_ns = end - start
+    return elapsed_ns, total_valid
+
+
+def benchmark_rust_individual(passwords: List[str], rounds: int) -> tuple[float, int]:
+    """Benchmark Rust validation with FFI overhead (10,000 individual calls)"""
+    validator = locksmith.PasswordValidator()
+    
+    start = time.perf_counter_ns()
+    total_valid = 0
+    for _ in range(rounds):
+        for password in passwords:
+            result = validator.validate_with_message(password)
+            if "valid" in result.lower():
+                total_valid += 1
     end = time.perf_counter_ns()
     elapsed_ns = end - start
     return elapsed_ns, total_valid
@@ -117,43 +133,50 @@ def main():
     print("=" * 70)
     print()
     
-    # Warmup runs
-    print("Warming up...")
-    benchmark_python(test_passwords, 100)
-    benchmark_rust(test_passwords, 100)
-    print()
-    
-    # Benchmark Python
-    print("Running Python benchmark...")
+    # Benchmark 1: Native Python (10,000 calls in Python)
+    print("1. Native Python Implementation (10,000 calls in Python)")
+    print("-" * 70)
     python_time_ns, python_valid = benchmark_python(test_passwords, args.rounds)
     print(f"  Total time: {format_time(python_time_ns)}")
     print(f"  Time per operation: {format_time(python_time_ns // (args.rounds * len(test_passwords)))}")
     print(f"  Valid passwords found: {python_valid:,}")
     print()
     
-    # Benchmark Rust
-    print("Running Rust benchmark...")
-    rust_time_ns, rust_valid = benchmark_rust(test_passwords, args.rounds)
-    print(f"  Total time: {format_time(rust_time_ns)}")
-    print(f"  Time per operation: {format_time(rust_time_ns // (args.rounds * len(test_passwords)))}")
-    print(f"  Valid passwords found: {rust_valid:,}")
+    # Benchmark 2: Rust Batch (Rust does 10,000 rounds internally)
+    print("2. Rust Batch Function (10,000 rounds in Rust)")
+    print("-" * 70)
+    rust_batch_time_ns, rust_batch_valid = benchmark_rust_batch(test_passwords, args.rounds)
+    print(f"  Total time: {format_time(rust_batch_time_ns)}")
+    print(f"  Time per operation: {format_time(rust_batch_time_ns // (args.rounds * len(test_passwords)))}")
+    print(f"  Valid passwords found: {rust_batch_valid:,}")
+    print()
+    
+    # Benchmark 3: Rust Individual (10,000 FFI calls from Python)
+    print("3. Rust Individual Calls (10,000 FFI calls from Python)")
+    print("-" * 70)
+    rust_individual_time_ns, rust_individual_valid = benchmark_rust_individual(test_passwords, args.rounds)
+    print(f"  Total time: {format_time(rust_individual_time_ns)}")
+    print(f"  Time per operation: {format_time(rust_individual_time_ns // (args.rounds * len(test_passwords)))}")
+    print(f"  Valid passwords found: {rust_individual_valid:,}")
     print()
     
     # Compare results
     print("=" * 70)
-    print("Comparison")
+    print("Performance Comparison")
     print("=" * 70)
-    speedup = python_time_ns / rust_time_ns if rust_time_ns > 0 else float('inf')
     
-    if speedup > 1:
-        print(f"✓ Rust is {speedup:.2f}x faster than Python")
-    elif speedup < 1:
-        print(f"⚠ Python is {1/speedup:.2f}x faster than Rust (unexpected)")
-    else:
-        print("= Performance is similar")
+    speedup_batch = python_time_ns / rust_batch_time_ns if rust_batch_time_ns > 0 else float('inf')
+    speedup_individual = python_time_ns / rust_individual_time_ns if rust_individual_time_ns > 0 else float('inf')
+    ffi_overhead = rust_individual_time_ns / rust_batch_time_ns if rust_batch_time_ns > 0 else float('inf')
     
-    if python_valid != rust_valid:
-        print(f"⚠ WARNING: Result mismatch! Python: {python_valid}, Rust: {rust_valid}")
+    print(f"Rust Batch vs Python:     {speedup_batch:.2f}x {'faster' if speedup_batch > 1 else 'slower'}")
+    print(f"Rust Individual vs Python: {speedup_individual:.2f}x {'faster' if speedup_individual > 1 else 'slower'}")
+    print(f"FFI Overhead:             {ffi_overhead:.2f}x (Individual vs Batch)")
+    print()
+    
+    if python_valid != rust_batch_valid or python_valid != rust_individual_valid:
+        print(f"⚠ WARNING: Result mismatch!")
+        print(f"  Python: {python_valid}, Rust Batch: {rust_batch_valid}, Rust Individual: {rust_individual_valid}")
     else:
         print(f"✓ Results match: {python_valid:,} valid passwords")
     

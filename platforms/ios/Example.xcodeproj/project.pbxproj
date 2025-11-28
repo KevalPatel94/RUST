@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		20CBA93B06D515E2696BEB37 /* Calculator in Frameworks */ = {isa = PBXBuildFile; productRef = 988FC2C2456DB38199D944DA /* Calculator */; };
+		22DDE0D2B58B7DA7C3FFA433 /* PasswordValidatorBenchmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */; };
+		2A135D186EBD60216FF06AF4 /* Calculator in Frameworks */ = {isa = PBXBuildFile; productRef = D4E7A70ED23BC429BB03503B /* Calculator */; };
 		35AD6C2365774F5D33D52D40 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B96384A58B59297D9BD79ED /* ViewController.swift */; };
 		4023B8B1CF865EFF5CA146AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */; };
 		71EE16B015BCBED9325AF3DD /* DebugViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB56A698052A5B50C6293C8 /* DebugViewController.swift */; };
@@ -16,6 +18,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		255252B4D76E09EE8A024B30 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CA8E1E974698BC95958F017F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F5B1AD8D0A078B8F12B791DE;
+			remoteInfo = LockSmithExample;
+		};
 		C70A0FEADA7D27BC4A5BEA49 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = CA8E1E974698BC95958F017F /* Project object */;
@@ -31,9 +40,12 @@
 		21D6104415BE7DD76A140E04 /* LockSmithExampleUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockSmithExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E3F8A25A25B8FC35209ADF6 /* ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ios; path = .; sourceTree = SOURCE_ROOT; };
 		3B96384A58B59297D9BD79ED /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		436BDEA3B038FB1AC4E58B41 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		66780219EBDB7EECD7087AB6 /* LockSmithExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LockSmithExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordValidatorBenchmarkTests.swift; sourceTree = "<group>"; };
 		BA2D92CE7B5ECEFE55D08A4B /* LockSmithExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSmithExampleUITests.swift; sourceTree = "<group>"; };
+		C1EF30BDD5D041D8F9E183D4 /* LockSmithExampleTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockSmithExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C38A13981D34B38CF8DC6507 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		FBB56A698052A5B50C6293C8 /* DebugViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -44,6 +56,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				20CBA93B06D515E2696BEB37 /* Calculator in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C406A45113FF2D11639C74D0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2A135D186EBD60216FF06AF4 /* Calculator in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,6 +100,7 @@
 		279B48795A9CAD2104D07D02 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				7EFABF9C72A6DAC53EC68FC4 /* LockSmithExampleTests */,
 				C5B07E4F3B71DCD9F907897B /* LockSmithExampleUITests */,
 			);
 			path = Tests;
@@ -90,9 +111,18 @@
 			children = (
 				070EF880726331CF53C350D8 /* LockSmithAllTests.xctest */,
 				66780219EBDB7EECD7087AB6 /* LockSmithExample.app */,
+				C1EF30BDD5D041D8F9E183D4 /* LockSmithExampleTests.xctest */,
 				21D6104415BE7DD76A140E04 /* LockSmithExampleUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3D1B2087BFD7FD74997C91D6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				436BDEA3B038FB1AC4E58B41 /* Info.plist */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		54E0667A38E60354DB90F776 = {
@@ -103,6 +133,15 @@
 				279B48795A9CAD2104D07D02 /* Tests */,
 				3031F8ABC084F8D43CC56342 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		7EFABF9C72A6DAC53EC68FC4 /* LockSmithExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */,
+				3D1B2087BFD7FD74997C91D6 /* Resources */,
+			);
+			path = LockSmithExampleTests;
 			sourceTree = "<group>";
 		};
 		AF700CA2C5CC3110CDA781C6 /* Resources */ = {
@@ -158,6 +197,26 @@
 			);
 			productName = LockSmithAllTests;
 			productReference = 070EF880726331CF53C350D8 /* LockSmithAllTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5A59CF54BD6480C3B1E56BDD /* LockSmithExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0CE95346DD2ABC6BABEE3C7D /* Build configuration list for PBXNativeTarget "LockSmithExampleTests" */;
+			buildPhases = (
+				A057D474D0850039BF3A0B4B /* Sources */,
+				C406A45113FF2D11639C74D0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4C3697ADB21FB918DECA033B /* PBXTargetDependency */,
+			);
+			name = LockSmithExampleTests;
+			packageProductDependencies = (
+				D4E7A70ED23BC429BB03503B /* Calculator */,
+			);
+			productName = LockSmithExampleTests;
+			productReference = C1EF30BDD5D041D8F9E183D4 /* LockSmithExampleTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		C395DC2FA5A2839F7510D094 /* LockSmithExampleUITests */ = {
@@ -233,6 +292,7 @@
 			targets = (
 				236601928487DB9398230BD1 /* LockSmithAllTests */,
 				F5B1AD8D0A078B8F12B791DE /* LockSmithExample */,
+				5A59CF54BD6480C3B1E56BDD /* LockSmithExampleTests */,
 				C395DC2FA5A2839F7510D094 /* LockSmithExampleUITests */,
 			);
 		};
@@ -256,6 +316,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A057D474D0850039BF3A0B4B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22DDE0D2B58B7DA7C3FFA433 /* PasswordValidatorBenchmarkTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F3766C22FEA095AD8200E7BC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -267,6 +335,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4C3697ADB21FB918DECA033B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F5B1AD8D0A078B8F12B791DE /* LockSmithExample */;
+			targetProxy = 255252B4D76E09EE8A024B30 /* PBXContainerItemProxy */;
+		};
 		7970A54737C31A31598D8DEA /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F5B1AD8D0A078B8F12B791DE /* LockSmithExample */;
@@ -275,6 +348,23 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0A995ECAC468FD40798A385C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/LockSmithExampleTests/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.venmo.LockSmithExampleTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LockSmithExample.app/LockSmithExample";
+			};
+			name = Release;
+		};
 		365663758D7344C6865958C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -382,6 +472,23 @@
 				REEXPORTED_FRAMEWORK_NAMES = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		556EA929A5986FC6F5475E7B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = Tests/LockSmithExampleTests/Resources/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.venmo.LockSmithExampleTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LockSmithExample.app/LockSmithExample";
 			};
 			name = Debug;
 		};
@@ -505,6 +612,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0CE95346DD2ABC6BABEE3C7D /* Build configuration list for PBXNativeTarget "LockSmithExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				556EA929A5986FC6F5475E7B /* Debug */,
+				0A995ECAC468FD40798A385C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		2A456E40B7E0E119CD95220F /* Build configuration list for PBXNativeTarget "LockSmithAllTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -556,6 +672,10 @@
 			productName = Calculator;
 		};
 		988FC2C2456DB38199D944DA /* Calculator */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Calculator;
+		};
+		D4E7A70ED23BC429BB03503B /* Calculator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Calculator;
 		};

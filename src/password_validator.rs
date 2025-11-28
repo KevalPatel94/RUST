@@ -108,6 +108,18 @@ pub fn validate_passwords_score_repeated(&self, inputs: Vec<String>, rounds: u32
         score
 }
 
+    pub fn validate_passwords_count_valid(&self, inputs: Vec<String>, rounds: u32) -> u64 {
+        let mut valid_count: u64 = 0;
+        for _ in 0..rounds {
+            for p in inputs.iter() {
+                if matches!(self.validate(p.clone()), PasswordValidation::Valid) {
+                    valid_count += 1;
+                }
+            }
+        }
+        valid_count
+    }
+
 /// Returns an aggregated policy message if the password violates any rule.
 /// If all rules are satisfied, returns an empty string.
 pub fn old_password_policy(&self, password: String) -> String {
