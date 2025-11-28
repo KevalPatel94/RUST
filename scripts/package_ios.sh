@@ -150,11 +150,105 @@ function package {
   printf "\n→ %s ${bold}%s${reset}...\n" "Placing framework in" "$output_dir"
   mv "$framework" "$output_dir"
   
-  # Show summary
+  # Helper function to convert bytes to MB
+  bytes_to_mb() {
+    local bytes=$1
+    if command -v bc >/dev/null 2>&1; then
+      echo "scale=2; $bytes / 1024 / 1024" | bc
+    else
+      # Fallback: use awk for floating point division
+      awk "BEGIN {printf \"%.2f\", $bytes / 1048576}"
+    fi
+  }
+  
+  # Show size summary
   printf "\n${bold}✓ Build complete!${reset}\n"
   printf "  Type: ${FRAMEWORK_TYPE}\n"
-  printf "  Size: $(du -sh "$output_dir/$framework" | cut -f1)\n"
   printf "  Location: $output_dir/$framework\n"
+  printf "\n${bold}Binary Sizes:${reset}\n"
+  
+  # Device binary size
+  if [ "$FRAMEWORK_TYPE" = "dynamic" ]; then
+    device_binary="./target/aarch64-apple-ios/release/$artifact_name.dylib"
+    if [ -f "$device_binary" ]; then
+      device_size=$(ls -lh "$device_binary" 2>/dev/null | awk '{print $5}')
+      device_bytes=$(stat -f%z "$device_binary" 2>/dev/null || stat -c%s "$device_binary" 2>/dev/null)
+      device_mb=$(bytes_to_mb "$device_bytes")
+      printf "  ${bold}Device (arm64):${reset}     %s (%s MB)\n" "$device_size" "$device_mb"
+    fi
+    
+    # Simulator binary sizes (individual architectures)
+    sim_arm64_binary="./target/aarch64-apple-ios-sim/release/$artifact_name.dylib"
+    sim_x86_binary="./target/x86_64-apple-ios/release/$artifact_name.dylib"
+    sim_universal_binary="$tmp/target/universal-ios/release/$artifact_name.dylib"
+    
+    if [ -f "$sim_arm64_binary" ]; then
+      sim_arm64_size=$(ls -lh "$sim_arm64_binary" | awk '{print $5}')
+      sim_arm64_bytes=$(stat -f%z "$sim_arm64_binary" 2>/dev/null || stat -c%s "$sim_arm64_binary" 2>/dev/null)
+      sim_arm64_mb=$(bytes_to_mb "$sim_arm64_bytes")
+      printf "  ${bold}Simulator (arm64):${reset}  %s (%s MB)\n" "$sim_arm64_size" "$sim_arm64_mb"
+    fi
+    
+    if [ -f "$sim_x86_binary" ]; then
+      sim_x86_size=$(ls -lh "$sim_x86_binary" | awk '{print $5}')
+      sim_x86_bytes=$(stat -f%z "$sim_x86_binary" 2>/dev/null || stat -c%s "$sim_x86_binary" 2>/dev/null)
+      sim_x86_mb=$(bytes_to_mb "$sim_x86_bytes")
+      printf "  ${bold}Simulator (x86_64):${reset} %s (%s MB)\n" "$sim_x86_size" "$sim_x86_mb"
+    fi
+    
+    if [ -f "$sim_universal_binary" ]; then
+      sim_universal_size=$(ls -lh "$sim_universal_binary" | awk '{print $5}')
+      sim_universal_bytes=$(stat -f%z "$sim_universal_binary" 2>/dev/null || stat -c%s "$sim_universal_binary" 2>/dev/null)
+      sim_universal_mb=$(echo "scale=2; $sim_universal_bytes / 1024 / 1024" | bc)
+      printf "  ${bold}Simulator (universal):${reset} %s (%s MB)\n" "$sim_universal_size" "$sim_universal_mb"
+    fi
+    
+    # Final xcframework size
+    xcframework_size=$(du -sh "$output_dir/$framework" | cut -f1)
+    xcframework_kb=$(du -sk "$output_dir/$framework" | cut -f1)
+    xcframework_mb=$(echo "scale=2; $xcframework_kb / 1024" | bc)
+    printf "  ${bold}XCFramework (total):${reset} %s (%s MB)\n" "$xcframework_size" "$xcframework_mb"
+  else
+    device_binary="./target/aarch64-apple-ios/release/$artifact_name.a"
+    if [ -f "$device_binary" ]; then
+      device_size=$(ls -lh "$device_binary" 2>/dev/null | awk '{print $5}')
+      device_bytes=$(stat -f%z "$device_binary" 2>/dev/null || stat -c%s "$device_binary" 2>/dev/null)
+      device_mb=$(bytes_to_mb "$device_bytes")
+      printf "  ${bold}Device (arm64):${reset}     %s (%s MB)\n" "$device_size" "$device_mb"
+    fi
+    
+    # Simulator binary sizes
+    sim_arm64_binary="./target/aarch64-apple-ios-sim/release/$artifact_name.a"
+    sim_x86_binary="./target/x86_64-apple-ios/release/$artifact_name.a"
+    sim_universal_binary="$tmp/target/universal-ios/release/$artifact_name.a"
+    
+    if [ -f "$sim_arm64_binary" ]; then
+      sim_arm64_size=$(ls -lh "$sim_arm64_binary" | awk '{print $5}')
+      sim_arm64_bytes=$(stat -f%z "$sim_arm64_binary" 2>/dev/null || stat -c%s "$sim_arm64_binary" 2>/dev/null)
+      sim_arm64_mb=$(bytes_to_mb "$sim_arm64_bytes")
+      printf "  ${bold}Simulator (arm64):${reset}  %s (%s MB)\n" "$sim_arm64_size" "$sim_arm64_mb"
+    fi
+    
+    if [ -f "$sim_x86_binary" ]; then
+      sim_x86_size=$(ls -lh "$sim_x86_binary" | awk '{print $5}')
+      sim_x86_bytes=$(stat -f%z "$sim_x86_binary" 2>/dev/null || stat -c%s "$sim_x86_binary" 2>/dev/null)
+      sim_x86_mb=$(bytes_to_mb "$sim_x86_bytes")
+      printf "  ${bold}Simulator (x86_64):${reset} %s (%s MB)\n" "$sim_x86_size" "$sim_x86_mb"
+    fi
+    
+    if [ -f "$sim_universal_binary" ]; then
+      sim_universal_size=$(ls -lh "$sim_universal_binary" | awk '{print $5}')
+      sim_universal_bytes=$(stat -f%z "$sim_universal_binary" 2>/dev/null || stat -c%s "$sim_universal_binary" 2>/dev/null)
+      sim_universal_mb=$(bytes_to_mb "$sim_universal_bytes")
+      printf "  ${bold}Simulator (universal):${reset} %s (%s MB)\n" "$sim_universal_size" "$sim_universal_mb"
+    fi
+    
+    # Final xcframework size
+    xcframework_size=$(du -sh "$output_dir/$framework" | cut -f1)
+    xcframework_kb=$(du -sk "$output_dir/$framework" | cut -f1)
+    xcframework_mb=$(bytes_to_mb "$((xcframework_kb * 1024))")
+    printf "  ${bold}XCFramework (total):${reset} %s (%s MB)\n" "$xcframework_size" "$xcframework_mb"
+  fi
 }
 
 package

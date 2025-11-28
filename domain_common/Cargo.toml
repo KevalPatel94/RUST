@@ -5,7 +5,8 @@ edition = "2021"
 
 [dependencies]
 # Async runtime for UseCase execution
-tokio = { version = "1", features = ["full"] }
+# rt-multi-thread: multi-threaded runtime (Runtime::new())
+tokio = { version = "1", features = ["rt-multi-thread"] }
 # Error handling
 thiserror = "1.0"
 # UniFFI for error types exposed to platforms

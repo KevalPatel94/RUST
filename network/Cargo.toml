@@ -7,9 +7,13 @@ license = "MIT"
 
 [dependencies]
 # Async HTTP client
-reqwest = { version = "0.12", default-features = true, features = ["json"] }
-# Async runtime
-tokio = { version = "1", features = ["full"] }
+# Disable default features (cookies, gzip, brotli, etc.) to reduce size
+# Enable minimal features needed: native-tls (TLS + HTTP/1.1), json (JSON parsing)
+# Note: native-tls includes HTTP/1.1 support. We avoid http2, gzip, brotli, cookies to save size
+reqwest = { version = "0.12", default-features = false, features = ["native-tls", "json"] }
+# Async runtime - minimal features
+# rt-multi-thread: reqwest needs multi-threaded runtime
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
 # Async trait support
 async-trait = "0.1"
 # Error handling

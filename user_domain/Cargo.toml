@@ -14,11 +14,9 @@ async-trait = "0.1"
 thiserror = "1.0"
 # UniFFI for FFI bindings
 uniffi = { version = "0.29.4" }
-# Tokio runtime for async operations
-tokio = { version = "1", features = ["full"] }
 
 [build-dependencies]
 uniffi = { version = "0.29.4", features = ["build"] }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = ["rt", "macros"] }

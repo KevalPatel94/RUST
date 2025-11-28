@@ -48,7 +48,9 @@ user_domain = { path = "user_domain" }
 # User data layer for repository
 user_data = { path = "user_data" }
 # Async runtime for sync wrappers
-tokio = { version = "1", features = ["full"] }
+# rt-multi-thread: multi-threaded runtime, time (for delays)
+# Avoid "full" which includes filesystem, process, signal, etc. (~2MB+ savings)
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
 # Error handling
 thiserror = "1.0"
 # JS/WASM only - not needed for iOS/Android
@@ -58,13 +60,14 @@ js-sys = { version = "0.3", optional = true }
 [build-dependencies]
 uniffi = { version = "0.29.4", features = [ "build" ] }
 
-# Optimize for size
+# Optimize for size - applies to all workspace members
 [profile.release]
-opt-level = "z"        # Optimize for size
-lto = true             # Enable Link Time Optimization
+opt-level = "z"        # Optimize for size (smallest binary)
+lto = true             # Enable Link Time Optimization (better dead code elimination)
 codegen-units = 1      # Better optimization with single codegen unit
 strip = true           # Strip symbols from binary
 panic = "abort"        # Reduce binary size by not including unwinding code
+debug = 0              # No debug info in release builds
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = false
