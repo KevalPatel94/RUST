@@ -179,6 +179,11 @@ final class ViewController: UIViewController {
         setupLayout()
         applyLocalization()
         updateValidationMessage(with: "")
+        Task {
+             let str = await validator.sayAfter(ms: 10000, who: "Kev😊")
+            print(str)
+        }
+
     }
 
     private func setupLayout() {

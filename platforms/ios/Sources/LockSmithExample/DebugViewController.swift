@@ -1,13 +1,20 @@
 import UIKit
+import SwiftUI
 
 final class DebugViewController: UITableViewController {
     private enum DebugItem: String, CaseIterable {
         case locksmith
+        case userListRxSwift
+        case userListSwiftUI
         
         var title: String {
             switch self {
             case .locksmith:
                 return "LockSmith"
+            case .userListRxSwift:
+                return "User List (RxSwift)"
+            case .userListSwiftUI:
+                return "User List (SwiftUI)"
             }
         }
     }
@@ -38,6 +45,13 @@ final class DebugViewController: UITableViewController {
         case .locksmith:
             let passwordViewController = ViewController()
             navigationController?.pushViewController(passwordViewController, animated: true)
+        case .userListRxSwift:
+            let userListViewController = UserListViewControllerRx()
+            navigationController?.pushViewController(userListViewController, animated: true)
+        case .userListSwiftUI:
+            let swiftUIView = UserListViewSwiftUI()
+            let hostingController = UIHostingController(rootView: swiftUIView)
+            navigationController?.pushViewController(hostingController, animated: true)
         }
     }
 }

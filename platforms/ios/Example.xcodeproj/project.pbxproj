@@ -11,10 +11,16 @@
 		22DDE0D2B58B7DA7C3FFA433 /* PasswordValidatorBenchmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */; };
 		2A135D186EBD60216FF06AF4 /* Calculator in Frameworks */ = {isa = PBXBuildFile; productRef = D4E7A70ED23BC429BB03503B /* Calculator */; };
 		35AD6C2365774F5D33D52D40 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B96384A58B59297D9BD79ED /* ViewController.swift */; };
+		384DAA3424F92340BD497F55 /* UserListViewModelRx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CB7003D269C685083A04C6 /* UserListViewModelRx.swift */; };
 		4023B8B1CF865EFF5CA146AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */; };
+		501B1CFAF94B1F1E58624E66 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B026D97C8225C6FB9997BBD1 /* RxSwift */; };
 		71EE16B015BCBED9325AF3DD /* DebugViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB56A698052A5B50C6293C8 /* DebugViewController.swift */; };
+		816C34456B6CDECACD683196 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 4E42556739CFEF72A9DECE37 /* RxCocoa */; };
+		8267514DB127FF00122758F8 /* UserListViewSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */; };
 		849EFECEC0CC99977B956174 /* Calculator in Frameworks */ = {isa = PBXBuildFile; productRef = 4C08CD168693A3E2091C108F /* Calculator */; };
+		9BF0547005B743477D46C446 /* UserListViewModelSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4907EF792544A64B6121C40 /* UserListViewModelSwiftUI.swift */; };
 		E46181ABB3397E45E98ACD88 /* LockSmithExampleUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2D92CE7B5ECEFE55D08A4B /* LockSmithExampleUITests.swift */; };
+		E77EA6816C891D31A1E4788B /* UserListViewControllerRx.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89672093BACCCC7531C628B /* UserListViewControllerRx.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,11 +48,15 @@
 		3B96384A58B59297D9BD79ED /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		436BDEA3B038FB1AC4E58B41 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewSwiftUI.swift; sourceTree = "<group>"; };
 		66780219EBDB7EECD7087AB6 /* LockSmithExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LockSmithExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A89672093BACCCC7531C628B /* UserListViewControllerRx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewControllerRx.swift; sourceTree = "<group>"; };
 		B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordValidatorBenchmarkTests.swift; sourceTree = "<group>"; };
 		BA2D92CE7B5ECEFE55D08A4B /* LockSmithExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSmithExampleUITests.swift; sourceTree = "<group>"; };
 		C1EF30BDD5D041D8F9E183D4 /* LockSmithExampleTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockSmithExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C38A13981D34B38CF8DC6507 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D0CB7003D269C685083A04C6 /* UserListViewModelRx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewModelRx.swift; sourceTree = "<group>"; };
+		D4907EF792544A64B6121C40 /* UserListViewModelSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewModelSwiftUI.swift; sourceTree = "<group>"; };
 		FBB56A698052A5B50C6293C8 /* DebugViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -72,6 +82,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				849EFECEC0CC99977B956174 /* Calculator in Frameworks */,
+				501B1CFAF94B1F1E58624E66 /* RxSwift in Frameworks */,
+				816C34456B6CDECACD683196 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,6 +105,9 @@
 				FBB56A698052A5B50C6293C8 /* DebugViewController.swift */,
 				3B96384A58B59297D9BD79ED /* ViewController.swift */,
 				EAEC0418EE5EE67554865D7E /* Resources */,
+				4C05EF63C9E24CA63CAA114A /* ViewControllers */,
+				EB2597797EFFBC7B2CD2D038 /* ViewModels */,
+				52CB41D29DA167FAB327554A /* Views */,
 			);
 			path = LockSmithExample;
 			sourceTree = "<group>";
@@ -123,6 +138,22 @@
 				436BDEA3B038FB1AC4E58B41 /* Info.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		4C05EF63C9E24CA63CAA114A /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				A89672093BACCCC7531C628B /* UserListViewControllerRx.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		52CB41D29DA167FAB327554A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		54E0667A38E60354DB90F776 = {
@@ -175,6 +206,15 @@
 				189D6FA311E3F6087345790F /* Info.plist */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		EB2597797EFFBC7B2CD2D038 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				D0CB7003D269C685083A04C6 /* UserListViewModelRx.swift */,
+				D4907EF792544A64B6121C40 /* UserListViewModelSwiftUI.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -251,6 +291,8 @@
 			name = LockSmithExample;
 			packageProductDependencies = (
 				4C08CD168693A3E2091C108F /* Calculator */,
+				B026D97C8225C6FB9997BBD1 /* RxSwift */,
+				4E42556739CFEF72A9DECE37 /* RxCocoa */,
 			);
 			productName = LockSmithExample;
 			productReference = 66780219EBDB7EECD7087AB6 /* LockSmithExample.app */;
@@ -284,6 +326,7 @@
 			mainGroup = 54E0667A38E60354DB90F776;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
+				A7EAD2F5E02E7129EA7798C3 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				C3931A35602C1F44F93BAFCD /* XCLocalSwiftPackageReference "." */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -312,6 +355,10 @@
 			files = (
 				4023B8B1CF865EFF5CA146AB /* AppDelegate.swift in Sources */,
 				71EE16B015BCBED9325AF3DD /* DebugViewController.swift in Sources */,
+				E77EA6816C891D31A1E4788B /* UserListViewControllerRx.swift in Sources */,
+				384DAA3424F92340BD497F55 /* UserListViewModelRx.swift in Sources */,
+				9BF0547005B743477D46C446 /* UserListViewModelSwiftUI.swift in Sources */,
+				8267514DB127FF00122758F8 /* UserListViewSwiftUI.swift in Sources */,
 				35AD6C2365774F5D33D52D40 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -666,14 +713,35 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		A7EAD2F5E02E7129EA7798C3 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		4C08CD168693A3E2091C108F /* Calculator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Calculator;
 		};
+		4E42556739CFEF72A9DECE37 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A7EAD2F5E02E7129EA7798C3 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
 		988FC2C2456DB38199D944DA /* Calculator */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Calculator;
+		};
+		B026D97C8225C6FB9997BBD1 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A7EAD2F5E02E7129EA7798C3 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
 		};
 		D4E7A70ED23BC429BB03503B /* Calculator */ = {
 			isa = XCSwiftPackageProductDependency;

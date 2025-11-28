@@ -1,0 +1,24 @@
+[package]
+name = "user_domain"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# User data crate for repository
+user_data = { path = "../user_data" }
+# Domain common infrastructure
+domain_common = { path = "../domain_common" }
+# Async trait support
+async-trait = "0.1"
+# Error handling
+thiserror = "1.0"
+# UniFFI for FFI bindings
+uniffi = { version = "0.29.4" }
+# Tokio runtime for async operations
+tokio = { version = "1", features = ["full"] }
+
+[build-dependencies]
+uniffi = { version = "0.29.4", features = ["build"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }

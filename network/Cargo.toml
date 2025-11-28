@@ -1,0 +1,22 @@
+[package]
+name = "network"
+version = "0.1.0"
+edition = "2021"
+description = "Network crate for making API calls, reusable across Android and iOS platforms"
+license = "MIT"
+
+[dependencies]
+# Async HTTP client
+reqwest = { version = "0.12", default-features = true, features = ["json"] }
+# Async runtime
+tokio = { version = "1", features = ["full"] }
+# Async trait support
+async-trait = "0.1"
+# Error handling
+thiserror = "1.0"
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+# URL handling
+url = "2.5"
+

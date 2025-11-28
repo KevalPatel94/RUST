@@ -4,6 +4,9 @@ pub mod localizer;
 pub mod password_validator;
 use password_validator::PasswordValidator;
 
+// Re-export domain types for UniFFI
+pub use user_domain::{GetUsersUseCaseImpl, UserDomainModel, DomainError, ErrorDisplay};
+
 // Only include JS/WASM exports when building for wasm32 with the "js" feature
 #[cfg(all(target_arch = "wasm32", feature = "js"))]
 pub mod wasm;

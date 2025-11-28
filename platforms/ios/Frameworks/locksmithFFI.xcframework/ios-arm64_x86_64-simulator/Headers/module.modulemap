@@ -1,5 +1,17 @@
-module locksmithFFI {
+module domain_commonFFI {
+    header "domain_commonFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}module locksmithFFI {
     header "locksmithFFI.h"
+    export *
+    use "Darwin"
+    use "_Builtin_stdbool"
+    use "_Builtin_stdint"
+}module user_domainFFI {
+    header "user_domainFFI.h"
     export *
     use "Darwin"
     use "_Builtin_stdbool"

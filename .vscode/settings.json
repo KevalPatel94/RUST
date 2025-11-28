@@ -1,0 +1,26 @@
+{
+  // rust-analyzer configuration (the modern, recommended Rust extension)
+  "rust-analyzer.checkOnSave.command": "clippy",
+  "rust-analyzer.cargo.features": "all",
+  "rust-analyzer.inlayHints.typeHints.enable": true,
+  "rust-analyzer.inlayHints.parameterHints.enable": true,
+  
+  // Enable better indexing and go-to-definition support
+  "rust-analyzer.cargo.buildScripts.enable": true,
+  "rust-analyzer.procMacro.enable": true,
+  "rust-analyzer.cargo.allFeatures": true,
+  
+  // Improve workspace support for multiple crates
+  "rust-analyzer.workspace.symbol.search.scope": "workspace_and_dependencies",
+  "rust-analyzer.lens.enable": true,
+  "rust-analyzer.hover.actions.enable": true,
+  
+  // Ensure proper indexing - important for go-to-definition
+  "rust-analyzer.diagnostics.enable": true,
+  "rust-analyzer.completion.autoimport.enable": true,
+  
+  // Enable cross-crate navigation (important for network crate)
+  "rust-analyzer.cargo.loadOutDirsFromCheck": true,
+  "rust-analyzer.imports.granularity.group": "module"
+}
+

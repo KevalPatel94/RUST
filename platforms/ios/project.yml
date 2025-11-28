@@ -18,6 +18,9 @@ options:
 packages:
   LockSmith:
     path: .
+  RxSwift:
+    url: https://github.com/ReactiveX/RxSwift.git
+    from: 6.7.1
 targets:
   LockSmithExample:
     type: application
@@ -25,6 +28,10 @@ targets:
     dependencies:
       - package: LockSmith
         product: Calculator
+      - package: RxSwift
+        product: RxSwift
+      - package: RxSwift
+        product: RxCocoa
     settings:
       base:	
         REEXPORTED_FRAMEWORK_NAMES: ""	

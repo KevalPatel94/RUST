@@ -1,0 +1,12 @@
+[package]
+name = "domain_common"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Async runtime for UseCase execution
+tokio = { version = "1", features = ["full"] }
+# Error handling
+thiserror = "1.0"
+# UniFFI for error types exposed to platforms
+uniffi = { version = "0.29.4" }

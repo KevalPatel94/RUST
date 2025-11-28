@@ -1,0 +1,31 @@
+{
+  "object" : {
+    "artifacts" : [
+      {
+        "kind" : {
+          "xcframework" : {
+
+          }
+        },
+        "packageRef" : {
+          "identity" : "ios",
+          "kind" : "root",
+          "location" : "/Users/kevalpatel/Desktop/LockSmith/platforms/ios",
+          "name" : "ios"
+        },
+        "path" : "/Users/kevalpatel/Desktop/LockSmith/platforms/ios/Frameworks/locksmithFFI.xcframework",
+        "source" : {
+          "type" : "local"
+        },
+        "targetName" : "LibLockSmith"
+      }
+    ],
+    "dependencies" : [
+
+    ],
+    "prebuilts" : [
+
+    ]
+  },
+  "version" : 7
+}
