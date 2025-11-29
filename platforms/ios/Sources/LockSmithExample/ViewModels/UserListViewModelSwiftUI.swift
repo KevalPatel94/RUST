@@ -3,16 +3,6 @@ import SwiftUI
 import LockSmith
 import Combine
 
-// MARK: - Presentation Model
-//struct UserPresentationModel: Identifiable {
-//    let id: UInt64
-//    let displayName: String
-//    let email: String
-//    let phone: String
-//    let age: UInt32
-//    let ageDisplay: String
-//}
-
 /// SwiftUI-based ViewModel for User List
 /// This ViewModel uses @Published properties for SwiftUI binding
 @MainActor
@@ -28,12 +18,12 @@ final class UserListViewModelSwiftUI: ObservableObject {
     @Published var showEmptyState: Bool = false
     
     // MARK: - Private
-    private let useCase: GetUsersUseCaseImpl
+    private let useCase: GetUsersUseCaseProtocol?
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initialization
-    init(useCase: GetUsersUseCaseImpl? = nil) {
-        self.useCase = useCase ?? (try! GetUsersUseCaseImpl())
+    init(useCase: GetUsersUseCaseProtocol? = GetUsersUseCaseImpl()) {
+        self.useCase = useCase 
     }
     
     // MARK: - Public Methods
@@ -47,8 +37,8 @@ final class UserListViewModelSwiftUI: ObservableObject {
         emptyStateButtonTitle = nil
         
         Task { @MainActor in
-            let result = await useCase.execute()
-            
+            let result = await useCase?.execute()
+            guard let result = result else { return }
             switch result {
             case .loaded(let domainUsers):
                 let presentationUsers = domainUsers.map { domainUser in

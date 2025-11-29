@@ -17,11 +17,13 @@ final class UserListViewModelRx {
     
     // MARK: - Private
     private let disposeBag = DisposeBag()
-    private let useCase: GetUsersUseCaseImpl
+    private let useCase: GetUsersUseCaseProtocol?
     
     // MARK: - Initialization
-    init(useCase: GetUsersUseCaseImpl? = nil) {
-        self.useCase = useCase ?? (try! GetUsersUseCaseImpl())
+    /// Initialize with dependency injection
+    /// - Parameter useCase: The use case to use. If nil, uses DependencyContainer.shared.getUsersUseCase
+    init(useCase: GetUsersUseCaseProtocol? = GetUsersUseCaseImpl()) {
+        self.useCase = useCase
         setupBindings()
     }
     
@@ -40,8 +42,8 @@ final class UserListViewModelRx {
             
             return Observable.create { observer in
                 Task {
-                    let result = await self.useCase.execute()
-                    
+                    let result = await self.useCase?.execute()
+                    guard let result = result else { return }
                     switch result {
                     case .loaded(let domainUsers):
                         let presentationUsers = domainUsers.map { domainUser in
