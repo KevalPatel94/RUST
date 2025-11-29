@@ -31,7 +31,7 @@ default = []
 # CLI feature only needed for the uniffi-bindgen binary
 bindgen-cli = ["uniffi/cli"]
 # Enable this feature to build JavaScript/WebAssembly bindings
-js = ["wasm-bindgen", "js-sys"]
+js = ["wasm-bindgen", "js-sys", "wasm-bindgen-futures", "web-sys", "serde-wasm-bindgen"]
 
 [dependencies]
 # Async for async operations
@@ -57,13 +57,18 @@ user_data = { path = "user_data" }
 # Avoid "full" which includes filesystem, process, signal, etc. (~2MB+ savings)
 tokio = { version = "1", features = ["rt-multi-thread", "time"] }
 
+# WASM-only dependencies
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 tokio = { version = "1", features = ["rt", "time"] }
 # Error handling
 thiserror = "1.0"
-# JS/WASM only - not needed for iOS/Android
+# JS/WASM bindings
 wasm-bindgen = { version = "0.2", optional = true }
 js-sys = { version = "0.3", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+web-sys = { version = "0.3", optional = true, features = ["Request", "RequestInit", "RequestMode", "Response", "Window", "Headers"] }
+serde = { version = "1.0", features = ["derive"] }
+serde-wasm-bindgen = { version = "0.6", optional = true }
 
 [build-dependencies]
 # UniFFI build dependency only needed for native platforms

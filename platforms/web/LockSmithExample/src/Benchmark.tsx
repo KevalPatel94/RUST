@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import {
   WasmPasswordValidator,
   initialize_localization,
@@ -191,6 +192,7 @@ function Benchmark() {
 
   return (
     <div className="benchmark">
+      <Link to="/" className="back-link">← Back to Menu</Link>
       <h1>Password Validator Benchmark</h1>
       
       <button
