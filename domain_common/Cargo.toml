@@ -4,10 +4,17 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# Async runtime for UseCase execution
-# rt-multi-thread: multi-threaded runtime (Runtime::new())
-tokio = { version = "1", features = ["rt-multi-thread"] }
 # Error handling
 thiserror = "1.0"
+
+# Native platform dependencies
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # UniFFI for error types exposed to platforms
+# Only needed for native platforms (Android/iOS/Python), not WASM
 uniffi = { version = "0.30.0" }
+# Async runtime for UseCase execution
+# rt-multi-thread: multi-threaded runtime
+tokio = { version = "1", features = ["rt-multi-thread"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio = { version = "1", features = ["rt", "time"] }

@@ -2,8 +2,8 @@ use std::time::Duration;
 use async_std::future::{timeout, pending};
 use crate::localizer;
 
-#[derive(uniffi::Enum)]
-#[derive(PartialEq, Debug)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Enum))]
 pub enum PasswordValidation {
   TooShort,
   TooLong,
@@ -14,13 +14,14 @@ pub enum PasswordValidation {
   Valid
 }
 
-#[derive(uniffi::Object, Default)]
+#[derive(Default)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Object))]
 pub struct PasswordValidator {}
 
-#[uniffi::export]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
 impl PasswordValidator {
 
-    #[uniffi::constructor]
+    #[cfg_attr(not(target_arch = "wasm32"), uniffi::constructor)]
     pub fn new() -> Self {
         Self::default()
     }

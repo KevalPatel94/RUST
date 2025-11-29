@@ -1,12 +1,14 @@
 /// Simple error display configuration for platforms
 /// Contains only what platforms need to display errors
-#[derive(Debug, Clone, uniffi::Record)]
+#[derive(Debug, Clone)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
 pub struct ErrorDisplay {
     pub title: String,
     pub subtitle: String,
 }
 
-#[derive(Debug, Clone, uniffi::Record)]
+#[derive(Debug, Clone)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
 pub struct EpmtyDataModel {
     pub title: String,
     pub subtitle: String,
@@ -17,7 +19,8 @@ pub struct EpmtyDataModel {
 /// Simplified error type for domain operations exposed via UniFFI
 /// Uses enum for UniFFI compatibility (Records can't be used as error types in Result)
 /// This is just a carrier - platforms convert it to ErrorDisplay to get title/subtitle
-#[derive(Debug, Clone, thiserror::Error, uniffi::Error)]
+#[derive(Debug, Clone, thiserror::Error)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Error))]
 pub enum DomainError {
     #[error("Domain error")]
     Error { display: ErrorDisplay },

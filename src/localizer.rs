@@ -97,7 +97,7 @@ fn load_translations_from_ftl(locale: &str) -> Result<HashMap<String, String>, B
 }
 
 // Global functions for easy access
-#[uniffi::export]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
 pub fn init_localization() {
     // Initialize translations (calling this loads them)
     let _ = get_translations();
@@ -108,14 +108,14 @@ pub fn init_localization() {
     }
 }
 
-#[uniffi::export]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
 pub fn set_global_locale(locale: String) {
     if let Ok(mut current_locale) = CURRENT_LOCALE.lock() {
         *current_locale = locale;
     }
 }
 
-#[uniffi::export]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
 pub fn get_localized_text(key: String) -> String {
     let translations = get_translations();
     
@@ -138,7 +138,7 @@ pub fn get_localized_text(key: String) -> String {
     format!("[{}]", key)
 }
 
-#[uniffi::export]
+#[cfg_attr(not(target_arch = "wasm32"), uniffi::export)]
 pub fn get_localized_text_with_params(key: String, params: HashMap<String, String>) -> String {
     let mut text = get_localized_text(key);
     

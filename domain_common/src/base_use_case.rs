@@ -1,6 +1,9 @@
 use crate::domain_error::{DomainError, ErrorDisplay};
 use std::sync::Arc;
+
+#[cfg(not(target_arch = "wasm32"))]
 use tokio::runtime::Runtime;
+
 
 /// Base UseCase that handles common concerns for all UseCases
 /// - Runtime management for async operations
@@ -8,12 +11,17 @@ use tokio::runtime::Runtime;
 /// - Common async execution patterns
 /// 
 /// This is shared across all domain crates (user_domain, product_domain, etc.)
+/// Note: Not available on WASM (user_domain is excluded from WASM builds)
+#[cfg(not(target_arch = "wasm32"))]
 pub struct BaseUseCase {
+    #[cfg(not(target_arch = "wasm32"))]
     runtime: Arc<Runtime>,
 }
 
+#[cfg(not(target_arch = "wasm32"))]
 impl BaseUseCase {
     /// Create a new BaseUseCase with a tokio runtime
+    /// Uses multi-threaded runtime on native platforms
     pub fn new() -> Result<Self, DomainError> {
         let runtime = Runtime::new()
             .map_err(|_| DomainError::Error {

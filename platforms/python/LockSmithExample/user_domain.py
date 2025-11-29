@@ -890,39 +890,28 @@ class _UniffiFfiConverterString:
             builder.write(value.encode("utf-8"))
             return builder.finalize()
 
-class _UniffiFfiConverterUInt32(_UniffiConverterPrimitiveInt):
-    CLASS_NAME = "u32"
-    VALUE_MIN = 0
-    VALUE_MAX = 2**32
-
-    @staticmethod
-    def read(buf):
-        return buf.read_u32()
-
-    @staticmethod
-    def write(value, buf):
-        buf.write_u32(value)
-
 @dataclass
 class UserDomainModel:
     """
     UserDomainModel - exposed via UniFFI for platform use
+    All user-facing strings are generated in Rust and included in this model
+    Only contains fields needed for presentation
 """
-    def __init__(self, *, id:int, first_name:str, last_name:str, email:str, phone:str, age:int, full_name:str, image_url:str):
+    def __init__(self, *, id:int, first_name:str, last_name:str, phone:str, full_name:str, image_url:str, age_display:str, email_display:str):
         self.id = id
         self.first_name = first_name
         self.last_name = last_name
-        self.email = email
         self.phone = phone
-        self.age = age
         self.full_name = full_name
         self.image_url = image_url
+        self.age_display = age_display
+        self.email_display = email_display
         
         
 
     
     def __str__(self):
-        return "UserDomainModel(id={}, first_name={}, last_name={}, email={}, phone={}, age={}, full_name={}, image_url={})".format(self.id, self.first_name, self.last_name, self.email, self.phone, self.age, self.full_name, self.image_url)
+        return "UserDomainModel(id={}, first_name={}, last_name={}, phone={}, full_name={}, image_url={}, age_display={}, email_display={})".format(self.id, self.first_name, self.last_name, self.phone, self.full_name, self.image_url, self.age_display, self.email_display)
     def __eq__(self, other):
         if self.id != other.id:
             return False
@@ -930,15 +919,15 @@ class UserDomainModel:
             return False
         if self.last_name != other.last_name:
             return False
-        if self.email != other.email:
-            return False
         if self.phone != other.phone:
-            return False
-        if self.age != other.age:
             return False
         if self.full_name != other.full_name:
             return False
         if self.image_url != other.image_url:
+            return False
+        if self.age_display != other.age_display:
+            return False
+        if self.email_display != other.email_display:
             return False
         return True
 
@@ -949,11 +938,11 @@ class _UniffiFfiConverterTypeUserDomainModel(_UniffiConverterRustBuffer):
             id=_UniffiFfiConverterUInt64.read(buf),
             first_name=_UniffiFfiConverterString.read(buf),
             last_name=_UniffiFfiConverterString.read(buf),
-            email=_UniffiFfiConverterString.read(buf),
             phone=_UniffiFfiConverterString.read(buf),
-            age=_UniffiFfiConverterUInt32.read(buf),
             full_name=_UniffiFfiConverterString.read(buf),
             image_url=_UniffiFfiConverterString.read(buf),
+            age_display=_UniffiFfiConverterString.read(buf),
+            email_display=_UniffiFfiConverterString.read(buf),
         )
 
     @staticmethod
@@ -961,22 +950,22 @@ class _UniffiFfiConverterTypeUserDomainModel(_UniffiConverterRustBuffer):
         _UniffiFfiConverterUInt64.check_lower(value.id)
         _UniffiFfiConverterString.check_lower(value.first_name)
         _UniffiFfiConverterString.check_lower(value.last_name)
-        _UniffiFfiConverterString.check_lower(value.email)
         _UniffiFfiConverterString.check_lower(value.phone)
-        _UniffiFfiConverterUInt32.check_lower(value.age)
         _UniffiFfiConverterString.check_lower(value.full_name)
         _UniffiFfiConverterString.check_lower(value.image_url)
+        _UniffiFfiConverterString.check_lower(value.age_display)
+        _UniffiFfiConverterString.check_lower(value.email_display)
 
     @staticmethod
     def write(value, buf):
         _UniffiFfiConverterUInt64.write(value.id, buf)
         _UniffiFfiConverterString.write(value.first_name, buf)
         _UniffiFfiConverterString.write(value.last_name, buf)
-        _UniffiFfiConverterString.write(value.email, buf)
         _UniffiFfiConverterString.write(value.phone, buf)
-        _UniffiFfiConverterUInt32.write(value.age, buf)
         _UniffiFfiConverterString.write(value.full_name, buf)
         _UniffiFfiConverterString.write(value.image_url, buf)
+        _UniffiFfiConverterString.write(value.age_display, buf)
+        _UniffiFfiConverterString.write(value.email_display, buf)
 
 class _UniffiFfiConverterSequenceTypeUserDomainModel(_UniffiConverterRustBuffer):
     @classmethod
