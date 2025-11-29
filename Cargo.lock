@@ -951,8 +951,6 @@ dependencies = [
  "tokio",
  "unic-langid",
  "uniffi",
- "user_data",
- "user_domain",
  "wasm-bindgen",
 ]
 

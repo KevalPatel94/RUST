@@ -38,7 +38,7 @@ package platform: release
       ./scripts/package_android.sh
       ;;
     Apple | IOS | apple | iOS | ios)
-      ./scripts/package_ios.sh
+      ./scripts/package_ios_separate.sh
       ;;
     Py | Python | py | python)
       ./scripts/package_python.sh

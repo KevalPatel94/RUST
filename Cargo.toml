@@ -43,10 +43,8 @@ once_cell = "1.21.3"
 unic-langid = { version = "0.9.6", features = ["macros"] }
 # Remove CLI feature - not needed for library builds
 uniffi = { version = "0.29.4" }
-# User domain layer for exposing use cases
-user_domain = { path = "user_domain" }
-# User data layer for repository
-user_data = { path = "user_data" }
+# User data layer for repository (only needed if locksmith uses it directly)
+# user_data = { path = "user_data" }
 # Async runtime for sync wrappers
 # rt-multi-thread: multi-threaded runtime, time (for delays)
 # Avoid "full" which includes filesystem, process, signal, etc. (~2MB+ savings)
