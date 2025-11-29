@@ -40,16 +40,17 @@ final class UserListViewModelRx {
             
             return Observable.create { observer in
                 Task {
-                    do {
-                        let domainUsers = try await self.useCase.execute()
+                    let result = await self.useCase.execute()
+                    
+                    switch result {
+                    case .loaded(let domainUsers):
                         let presentationUsers = domainUsers.map { domainUser in
                             UserPresentationModel(
                                 id: domainUser.id,
                                 displayName: domainUser.fullName,
-                                email: domainUser.email,
+                                email: domainUser.emailDisplay,
                                 phone: domainUser.phone,
-                                age: domainUser.age,
-                                ageDisplay: "\(domainUser.age) years old",
+                                ageDisplay: domainUser.ageDisplay,
                                 imageUrl: domainUser.imageUrl
                             )
                         }
@@ -57,13 +58,19 @@ final class UserListViewModelRx {
                             observer.onNext(presentationUsers)
                             observer.onCompleted()
                         }
-                    } catch let error as DomainError {
+                        
+                    case .empty(_):
+                        // Empty case - no users to display
                         await MainActor.run {
-                            observer.onError(error)
+                            observer.onNext([])
+                            observer.onCompleted()
                         }
-                    } catch {
+                        
+                    case .error(let errorDisplay):
+                        // Error case - convert ErrorDisplay to error
+                        let errorMessage = "\(errorDisplay.title): \(errorDisplay.subtitle)"
                         await MainActor.run {
-                            observer.onError(error)
+                            observer.onError(NSError(domain: "UserDomainError", code: -1, userInfo: [NSLocalizedDescriptionKey: errorMessage]))
                         }
                     }
                 }
@@ -75,23 +82,9 @@ final class UserListViewModelRx {
             onNext: { [weak self] users in
                 self?.isLoading.onNext(false)
                 self?.users.onNext(users)
-            },
-            onError: { [weak self] error in
-                self?.isLoading.onNext(false)
-                let errorMessage = self?.formatError(error) ?? "Unknown error"
-                self?.error.onNext(errorMessage)
             }
         )
         .disposed(by: disposeBag)
-    }
-    
-    private func formatError(_ error: Error) -> String {
-        // Convert DomainError to ErrorDisplay - platforms just need title/subtitle
-        if let domainError = error as? DomainError {
-            let errorDisplay = useCase.toErrorDisplay(error: domainError)
-            return "\(errorDisplay.title): \(errorDisplay.subtitle)"
-        }
-        return error.localizedDescription
     }
 }
 
@@ -101,7 +94,6 @@ struct UserPresentationModel: Identifiable {
     let displayName: String
     let email: String
     let phone: String
-    let age: UInt32
     let ageDisplay: String
     let imageUrl: String
 }

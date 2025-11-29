@@ -5,4 +5,4 @@ pub mod base_use_case;
 pub mod domain_error;
 
 pub use base_use_case::BaseUseCase;
-pub use domain_error::{DomainError, ErrorDisplay};
+pub use domain_error::{DomainError, ErrorDisplay, EpmtyDataModel};

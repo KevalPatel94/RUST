@@ -352,19 +352,29 @@ private func uniffiTraitInterfaceCallWithError<T, E>(
         callStatus.pointee.errorBuf = FfiConverterString.lower(String(describing: error))
     }
 }
+// Initial value and increment amount for handles. 
+// These ensure that SWIFT handles always have the lowest bit set
+fileprivate let UNIFFI_HANDLEMAP_INITIAL: UInt64 = 1
+fileprivate let UNIFFI_HANDLEMAP_DELTA: UInt64 = 2
+
 fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
     // All mutation happens with this lock held, which is why we implement @unchecked Sendable.
     private let lock = NSLock()
     private var map: [UInt64: T] = [:]
-    private var currentHandle: UInt64 = 1
+    private var currentHandle: UInt64 = UNIFFI_HANDLEMAP_INITIAL
 
     func insert(obj: T) -> UInt64 {
         lock.withLock {
-            let handle = currentHandle
-            currentHandle += 1
-            map[handle] = obj
-            return handle
+            return doInsert(obj)
         }
+    }
+
+    // Low-level insert function, this assumes `lock` is held.
+    private func doInsert(_ obj: T) -> UInt64 {
+        let handle = currentHandle
+        currentHandle += UNIFFI_HANDLEMAP_DELTA
+        map[handle] = obj
+        return handle
     }
 
      func get(handle: UInt64) throws -> T {
@@ -373,6 +383,15 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
                 throw UniffiInternalError.unexpectedStaleHandle
             }
             return obj
+        }
+    }
+
+     func clone(handle: UInt64) throws -> UInt64 {
+        try lock.withLock {
+            guard let obj = map[handle] else {
+                throw UniffiInternalError.unexpectedStaleHandle
+            }
+            return doInsert(obj)
         }
     }
 
@@ -495,13 +514,13 @@ public protocol PasswordValidatorProtocol: AnyObject, Sendable {
     
 }
 open class PasswordValidator: PasswordValidatorProtocol, @unchecked Sendable {
-    fileprivate let pointer: UnsafeMutableRawPointer!
+    fileprivate let handle: UInt64
 
-    /// Used to instantiate a [FFIObject] without an actual pointer, for fakes in tests, mostly.
+    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public struct NoPointer {
+    public struct NoHandle {
         public init() {}
     }
 
@@ -511,43 +530,39 @@ open class PasswordValidator: PasswordValidatorProtocol, @unchecked Sendable {
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    required public init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
-        self.pointer = pointer
+    required public init(unsafeFromHandle handle: UInt64) {
+        self.handle = handle
     }
 
     // This constructor can be used to instantiate a fake object.
-    // - Parameter noPointer: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
+    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
     //
     // - Warning:
-    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing [Pointer] the FFI lower functions will crash.
+    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public init(noPointer: NoPointer) {
-        self.pointer = nil
+    public init(noHandle: NoHandle) {
+        self.handle = 0
     }
 
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public func uniffiClonePointer() -> UnsafeMutableRawPointer {
-        return try! rustCall { uniffi_locksmith_fn_clone_passwordvalidator(self.pointer, $0) }
+    public func uniffiCloneHandle() -> UInt64 {
+        return try! rustCall { uniffi_locksmith_fn_clone_passwordvalidator(self.handle, $0) }
     }
 public convenience init() {
-    let pointer =
+    let handle =
         try! rustCall() {
     uniffi_locksmith_fn_constructor_passwordvalidator_new($0
     )
 }
-    self.init(unsafeFromRawPointer: pointer)
+    self.init(unsafeFromHandle: handle)
 }
 
     deinit {
-        guard let pointer = pointer else {
-            return
-        }
-
-        try! rustCall { uniffi_locksmith_fn_free_passwordvalidator(pointer, $0) }
+        try! rustCall { uniffi_locksmith_fn_free_passwordvalidator(handle, $0) }
     }
 
     
@@ -559,7 +574,8 @@ public convenience init() {
      */
 open func oldPasswordPolicy(password: String) -> String  {
     return try!  FfiConverterString.lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_old_password_policy(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_old_password_policy(
+            self.uniffiCloneHandle(),
         FfiConverterString.lower(password),$0
     )
 })
@@ -570,7 +586,7 @@ open func sayAfter(ms: UInt64, who: String)async  -> String  {
         try!  await uniffiRustCallAsync(
             rustFutureFunc: {
                 uniffi_locksmith_fn_method_passwordvalidator_say_after(
-                    self.uniffiClonePointer(),
+                    self.uniffiCloneHandle(),
                     FfiConverterUInt64.lower(ms),FfiConverterString.lower(who)
                 )
             },
@@ -585,7 +601,8 @@ open func sayAfter(ms: UInt64, who: String)async  -> String  {
     
 open func validate(password: String) -> PasswordValidation  {
     return try!  FfiConverterTypePasswordValidation_lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_validate(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_validate(
+            self.uniffiCloneHandle(),
         FfiConverterString.lower(password),$0
     )
 })
@@ -593,7 +610,8 @@ open func validate(password: String) -> PasswordValidation  {
     
 open func validatePasswordMessageNonLocalized(password: String) -> String  {
     return try!  FfiConverterString.lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(
+            self.uniffiCloneHandle(),
         FfiConverterString.lower(password),$0
     )
 })
@@ -601,7 +619,8 @@ open func validatePasswordMessageNonLocalized(password: String) -> String  {
     
 open func validatePasswordsCountValid(inputs: [String], rounds: UInt32) -> UInt64  {
     return try!  FfiConverterUInt64.lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(
+            self.uniffiCloneHandle(),
         FfiConverterSequenceString.lower(inputs),
         FfiConverterUInt32.lower(rounds),$0
     )
@@ -610,7 +629,8 @@ open func validatePasswordsCountValid(inputs: [String], rounds: UInt32) -> UInt6
     
 open func validatePasswordsScoreRepeated(inputs: [String], rounds: UInt32) -> UInt64  {
     return try!  FfiConverterUInt64.lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated(
+            self.uniffiCloneHandle(),
         FfiConverterSequenceString.lower(inputs),
         FfiConverterUInt32.lower(rounds),$0
     )
@@ -619,13 +639,15 @@ open func validatePasswordsScoreRepeated(inputs: [String], rounds: UInt32) -> UI
     
 open func validateWithMessage(password: String) -> String  {
     return try!  FfiConverterString.lift(try! rustCall() {
-    uniffi_locksmith_fn_method_passwordvalidator_validate_with_message(self.uniffiClonePointer(),
+    uniffi_locksmith_fn_method_passwordvalidator_validate_with_message(
+            self.uniffiCloneHandle(),
         FfiConverterString.lower(password),$0
     )
 })
 }
     
 
+    
 }
 
 
@@ -633,33 +655,24 @@ open func validateWithMessage(password: String) -> String  {
 @_documentation(visibility: private)
 #endif
 public struct FfiConverterTypePasswordValidator: FfiConverter {
-
-    typealias FfiType = UnsafeMutableRawPointer
+    typealias FfiType = UInt64
     typealias SwiftType = PasswordValidator
 
-    public static func lift(_ pointer: UnsafeMutableRawPointer) throws -> PasswordValidator {
-        return PasswordValidator(unsafeFromRawPointer: pointer)
+    public static func lift(_ handle: UInt64) throws -> PasswordValidator {
+        return PasswordValidator(unsafeFromHandle: handle)
     }
 
-    public static func lower(_ value: PasswordValidator) -> UnsafeMutableRawPointer {
-        return value.uniffiClonePointer()
+    public static func lower(_ value: PasswordValidator) -> UInt64 {
+        return value.uniffiCloneHandle()
     }
 
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> PasswordValidator {
-        let v: UInt64 = try readInt(&buf)
-        // The Rust code won't compile if a pointer won't fit in a UInt64.
-        // We have to go via `UInt` because that's the thing that's the size of a pointer.
-        let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
-            throw UniffiInternalError.unexpectedNullPointer
-        }
-        return try lift(ptr!)
+        let handle: UInt64 = try readInt(&buf)
+        return try lift(handle)
     }
 
     public static func write(_ value: PasswordValidator, into buf: inout [UInt8]) {
-        // This fiddling is because `Int` is the thing that's the same size as a pointer.
-        // The Rust code won't compile if a pointer won't fit in a `UInt64`.
-        writeInt(&buf, UInt64(bitPattern: Int64(Int(bitPattern: lower(value)))))
+        writeInt(&buf, lower(value))
     }
 }
 
@@ -667,14 +680,14 @@ public struct FfiConverterTypePasswordValidator: FfiConverter {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypePasswordValidator_lift(_ pointer: UnsafeMutableRawPointer) throws -> PasswordValidator {
-    return try FfiConverterTypePasswordValidator.lift(pointer)
+public func FfiConverterTypePasswordValidator_lift(_ handle: UInt64) throws -> PasswordValidator {
+    return try FfiConverterTypePasswordValidator.lift(handle)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypePasswordValidator_lower(_ value: PasswordValidator) -> UnsafeMutableRawPointer {
+public func FfiConverterTypePasswordValidator_lower(_ value: PasswordValidator) -> UInt64 {
     return FfiConverterTypePasswordValidator.lower(value)
 }
 
@@ -683,7 +696,7 @@ public func FfiConverterTypePasswordValidator_lower(_ value: PasswordValidator) 
 // Note that we don't yet support `indirect` for enums.
 // See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
 
-public enum PasswordValidation {
+public enum PasswordValidation: Equatable, Hashable {
     
     case tooShort
     case tooLong
@@ -692,8 +705,10 @@ public enum PasswordValidation {
     case noNumber
     case noSymbol
     case valid
-}
 
+
+
+}
 
 #if compiler(>=6)
 extension PasswordValidation: Sendable {}
@@ -778,13 +793,6 @@ public func FfiConverterTypePasswordValidation_lower(_ value: PasswordValidation
 }
 
 
-extension PasswordValidation: Equatable, Hashable {}
-
-
-
-
-
-
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
@@ -836,7 +844,7 @@ fileprivate struct FfiConverterDictionaryStringString: FfiConverterRustBuffer {
     }
 }
 private let UNIFFI_RUST_FUTURE_POLL_READY: Int8 = 0
-private let UNIFFI_RUST_FUTURE_POLL_MAYBE_READY: Int8 = 1
+private let UNIFFI_RUST_FUTURE_POLL_WAKE: Int8 = 1
 
 fileprivate let uniffiContinuationHandleMap = UniffiHandleMap<UnsafeContinuation<Int8, Never>>()
 
@@ -860,7 +868,9 @@ fileprivate func uniffiRustCallAsync<F, T>(
         pollResult = await withUnsafeContinuation {
             pollFunc(
                 rustFuture,
-                uniffiFutureContinuationCallback,
+                { handle, pollResult in
+                    uniffiFutureContinuationCallback(handle: handle, pollResult: pollResult)
+                },
                 uniffiContinuationHandleMap.insert(obj: $0)
             )
         }
@@ -965,7 +975,7 @@ private enum InitializationResult {
 // the code inside is only computed once.
 private let initializationResult: InitializationResult = {
     // Get the bindings contract version from our ComponentInterface
-    let bindings_contract_version = 29
+    let bindings_contract_version = 30
     // Get the scaffolding contract version by calling the into the dylib
     let scaffolding_contract_version = ffi_locksmith_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {

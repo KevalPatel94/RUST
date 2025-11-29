@@ -3,7 +3,7 @@
 
 @file:Suppress("NAME_SHADOWING")
 
-package uniffi.locksmith
+package uniffi.user_domain
 
 // Common helper code.
 //
@@ -38,6 +38,12 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import uniffi.domain_common.EpmtyDataModel
+import uniffi.domain_common.ErrorDisplay
+import uniffi.domain_common.FfiConverterTypeEpmtyDataModel
+import uniffi.domain_common.FfiConverterTypeErrorDisplay
+import uniffi.domain_common.RustBuffer as RustBufferEpmtyDataModel
+import uniffi.domain_common.RustBuffer as RustBufferErrorDisplay
 
 // This is a helper for safely working with byte buffers returned from the Rust code.
 // A rust-owned buffer is represented by its capacity, its current length, and a
@@ -66,7 +72,7 @@ open class RustBuffer : Structure() {
     companion object {
         internal fun alloc(size: ULong = 0UL) = uniffiRustCall() { status ->
             // Note: need to convert the size to a `Long` value to make this work with JVM.
-            UniffiLib.ffi_locksmith_rustbuffer_alloc(size.toLong(), status)
+            UniffiLib.ffi_user_domain_rustbuffer_alloc(size.toLong(), status)
         }.also {
             if(it.data == null) {
                throw RuntimeException("RustBuffer.alloc() returned null data pointer (size=${size})")
@@ -82,7 +88,7 @@ open class RustBuffer : Structure() {
         }
 
         internal fun free(buf: RustBuffer.ByValue) = uniffiRustCall() { status ->
-            UniffiLib.ffi_locksmith_rustbuffer_free(buf, status)
+            UniffiLib.ffi_user_domain_rustbuffer_free(buf, status)
         }
     }
 
@@ -637,49 +643,15 @@ internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
 // We now use JNA's "direct mapping" - unclear if same considerations apply exactly.
 internal object IntegrityCheckingUniffiLib {
     init {
-        Native.register(IntegrityCheckingUniffiLib::class.java, findLibraryName(componentName = "locksmith"))
+        Native.register(IntegrityCheckingUniffiLib::class.java, findLibraryName(componentName = "user_domain"))
         uniffiCheckContractApiVersion(this)
         uniffiCheckApiChecksums(this)
     }
-    external fun uniffi_locksmith_checksum_func_add(
+    external fun uniffi_user_domain_checksum_method_getusersusecaseimpl_execute(
     ): Short
-    external fun uniffi_locksmith_checksum_func_difference(
+    external fun uniffi_user_domain_checksum_constructor_getusersusecaseimpl_new(
     ): Short
-    external fun uniffi_locksmith_checksum_func_get_localized_text(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_get_localized_text_with_params(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_get_rust_demo_title(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_get_translated_text(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_init_localization(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_initialize_localization(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_set_app_locale(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_set_global_locale(
-    ): Short
-    external fun uniffi_locksmith_checksum_func_validate_password_localized(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_old_password_policy(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_say_after(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_validate(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated(
-    ): Short
-    external fun uniffi_locksmith_checksum_method_passwordvalidator_validate_with_message(
-    ): Short
-    external fun uniffi_locksmith_checksum_constructor_passwordvalidator_new(
-    ): Short
-    external fun ffi_locksmith_uniffi_contract_version(
+    external fun ffi_user_domain_uniffi_contract_version(
     ): Int
     
         
@@ -694,154 +666,121 @@ internal object UniffiLib {
     
 
     init {
-        Native.register(UniffiLib::class.java, findLibraryName(componentName = "locksmith"))
+        Native.register(UniffiLib::class.java, findLibraryName(componentName = "user_domain"))
+        uniffi.domain_common.uniffiEnsureInitialized()
         
     }
-    external fun uniffi_locksmith_fn_clone_passwordvalidator(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_user_domain_fn_clone_getusersusecaseimpl(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Long
-    external fun uniffi_locksmith_fn_free_passwordvalidator(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_user_domain_fn_free_getusersusecaseimpl(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
-    external fun uniffi_locksmith_fn_constructor_passwordvalidator_new(uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_user_domain_fn_constructor_getusersusecaseimpl_new(uniffi_out_err: UniffiRustCallStatus, 
     ): Long
-    external fun uniffi_locksmith_fn_method_passwordvalidator_old_password_policy(`ptr`: Long,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_method_passwordvalidator_say_after(`ptr`: Long,`ms`: Long,`who`: RustBuffer.ByValue,
+    external fun uniffi_user_domain_fn_method_getusersusecaseimpl_execute(`ptr`: Long,
     ): Long
-    external fun uniffi_locksmith_fn_method_passwordvalidator_validate(`ptr`: Long,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(`ptr`: Long,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(`ptr`: Long,`inputs`: RustBuffer.ByValue,`rounds`: Int,uniffi_out_err: UniffiRustCallStatus, 
-    ): Long
-    external fun uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated(`ptr`: Long,`inputs`: RustBuffer.ByValue,`rounds`: Int,uniffi_out_err: UniffiRustCallStatus, 
-    ): Long
-    external fun uniffi_locksmith_fn_method_passwordvalidator_validate_with_message(`ptr`: Long,`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_func_add(`a`: Long,`b`: Long,uniffi_out_err: UniffiRustCallStatus, 
-    ): Long
-    external fun uniffi_locksmith_fn_func_difference(`a`: Long,`b`: Long,uniffi_out_err: UniffiRustCallStatus, 
-    ): Long
-    external fun uniffi_locksmith_fn_func_get_localized_text(`key`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_func_get_localized_text_with_params(`key`: RustBuffer.ByValue,`params`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_func_get_rust_demo_title(`name`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_func_get_translated_text(`key`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun uniffi_locksmith_fn_func_init_localization(uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
-    external fun uniffi_locksmith_fn_func_initialize_localization(uniffi_out_err: UniffiRustCallStatus, 
-    ): Unit
-    external fun uniffi_locksmith_fn_func_set_app_locale(`locale`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): Unit
-    external fun uniffi_locksmith_fn_func_set_global_locale(`locale`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): Unit
-    external fun uniffi_locksmith_fn_func_validate_password_localized(`password`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
-    external fun ffi_locksmith_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun ffi_locksmith_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun ffi_locksmith_rustbuffer_free(`buf`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_poll_u8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rustbuffer_reserve(`buf`: RustBuffer.ByValue,`additional`: Long,uniffi_out_err: UniffiRustCallStatus, 
-    ): RustBuffer.ByValue
-    external fun ffi_locksmith_rust_future_poll_u8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_cancel_u8(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_u8(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_u8(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_u8(`handle`: Long,
-    ): Unit
-    external fun ffi_locksmith_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_u8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
-    external fun ffi_locksmith_rust_future_poll_i8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_i8(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_i8(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_i8(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_i8(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_i8(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_i8(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Byte
-    external fun ffi_locksmith_rust_future_poll_u16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_u16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_u16(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_u16(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_u16(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_u16(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_u16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Short
-    external fun ffi_locksmith_rust_future_poll_i16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_i16(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_i16(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_i16(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_i16(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_i16(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_i16(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Short
-    external fun ffi_locksmith_rust_future_poll_u32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_u32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_u32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_u32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_u32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_u32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_u32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Int
-    external fun ffi_locksmith_rust_future_poll_i32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_i32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_i32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_i32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_i32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_i32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_i32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Int
-    external fun ffi_locksmith_rust_future_poll_u64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_u64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_u64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_u64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_u64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_u64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_u64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Long
-    external fun ffi_locksmith_rust_future_poll_i64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_i64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_i64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_i64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_i64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_i64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_i64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Long
-    external fun ffi_locksmith_rust_future_poll_f32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_f32(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_f32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_f32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_f32(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_f32(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_f32(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Float
-    external fun ffi_locksmith_rust_future_poll_f64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_f64(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_f64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_f64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_f64(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_f64(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_f64(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Double
-    external fun ffi_locksmith_rust_future_poll_rust_buffer(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_rust_buffer(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_rust_buffer(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_rust_buffer(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_rust_buffer(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_rust_buffer(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_rust_buffer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): RustBuffer.ByValue
-    external fun ffi_locksmith_rust_future_poll_void(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
+    external fun ffi_user_domain_rust_future_poll_void(`handle`: Long,`callback`: UniffiRustFutureContinuationCallback,`callbackData`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_cancel_void(`handle`: Long,
+    external fun ffi_user_domain_rust_future_cancel_void(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_free_void(`handle`: Long,
+    external fun ffi_user_domain_rust_future_free_void(`handle`: Long,
     ): Unit
-    external fun ffi_locksmith_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun ffi_user_domain_rust_future_complete_void(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
     ): Unit
     
         
@@ -851,68 +790,17 @@ private fun uniffiCheckContractApiVersion(lib: IntegrityCheckingUniffiLib) {
     // Get the bindings contract version from our ComponentInterface
     val bindings_contract_version = 30
     // Get the scaffolding contract version by calling the into the dylib
-    val scaffolding_contract_version = lib.ffi_locksmith_uniffi_contract_version()
+    val scaffolding_contract_version = lib.ffi_user_domain_uniffi_contract_version()
     if (bindings_contract_version != scaffolding_contract_version) {
         throw RuntimeException("UniFFI contract version mismatch: try cleaning and rebuilding your project")
     }
 }
 @Suppress("UNUSED_PARAMETER")
 private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
-    if (lib.uniffi_locksmith_checksum_func_add() != 63154.toShort()) {
+    if (lib.uniffi_user_domain_checksum_method_getusersusecaseimpl_execute() != 13647.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_locksmith_checksum_func_difference() != 58157.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_get_localized_text() != 49322.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_get_localized_text_with_params() != 35097.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_get_rust_demo_title() != 9269.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_get_translated_text() != 30100.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_init_localization() != 61390.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_initialize_localization() != 54723.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_set_app_locale() != 56917.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_set_global_locale() != 27461.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_func_validate_password_localized() != 27505.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_old_password_policy() != 29227.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_say_after() != 12073.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate() != 65320.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_password_message_non_localized() != 46553.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_count_valid() != 56050.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_passwords_score_repeated() != 45591.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_method_passwordvalidator_validate_with_message() != 63839.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_locksmith_checksum_constructor_passwordvalidator_new() != 44990.toShort()) {
+    if (lib.uniffi_user_domain_checksum_constructor_getusersusecaseimpl_new() != 39125.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1115,29 +1003,6 @@ private class JavaLangRefCleanable(
 /**
  * @suppress
  */
-public object FfiConverterUInt: FfiConverter<UInt, Int> {
-    override fun lift(value: Int): UInt {
-        return value.toUInt()
-    }
-
-    override fun read(buf: ByteBuffer): UInt {
-        return lift(buf.getInt())
-    }
-
-    override fun lower(value: UInt): Int {
-        return value.toInt()
-    }
-
-    override fun allocationSize(value: UInt) = 4UL
-
-    override fun write(value: UInt, buf: ByteBuffer) {
-        buf.putInt(value.toInt())
-    }
-}
-
-/**
- * @suppress
- */
 public object FfiConverterULong: FfiConverter<ULong, Long> {
     override fun lift(value: Long): ULong {
         return value.toULong()
@@ -1312,30 +1177,29 @@ public object FfiConverterString: FfiConverter<String, RustBuffer.ByValue> {
 
 
 //
-public interface PasswordValidatorInterface {
+/**
+ * GetUsersUseCaseImpl - directly exposed via UniFFI for platform use
+ * This is the concrete implementation that platforms will use directly
+ * Uses BaseUseCase for common runtime and error handling concerns
+ */
+public interface GetUsersUseCaseImplInterface {
     
     /**
-     * Returns an aggregated policy message if the password violates any rule.
-     * If all rules are satisfied, returns an empty string.
+     * Execute the use case to get all users
+     * Returns UserDomainResultModel with Loaded, Empty, or Error state
+     * The use case logic determines which case to use based on business rules
      */
-    fun `oldPasswordPolicy`(`password`: kotlin.String): kotlin.String
-    
-    suspend fun `sayAfter`(`ms`: kotlin.ULong, `who`: kotlin.String): kotlin.String
-    
-    fun `validate`(`password`: kotlin.String): PasswordValidation
-    
-    fun `validatePasswordMessageNonLocalized`(`password`: kotlin.String): kotlin.String
-    
-    fun `validatePasswordsCountValid`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong
-    
-    fun `validatePasswordsScoreRepeated`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong
-    
-    fun `validateWithMessage`(`password`: kotlin.String): kotlin.String
+    suspend fun `execute`(): UserDomainResultModel
     
     companion object
 }
 
-open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterface
+/**
+ * GetUsersUseCaseImpl - directly exposed via UniFFI for platform use
+ * This is the concrete implementation that platforms will use directly
+ * Uses BaseUseCase for common runtime and error handling concerns
+ */
+open class GetUsersUseCaseImpl: Disposable, AutoCloseable, GetUsersUseCaseImplInterface
 {
 
     @Suppress("UNUSED_PARAMETER")
@@ -1359,10 +1223,13 @@ open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterf
         this.handle = 0
         this.cleanable = UniffiLib.CLEANER.register(this, UniffiCleanAction(handle))
     }
+    /**
+     * Constructor - creates a new GetUsersUseCaseImpl using BaseUseCase
+     */
     constructor() :
         this(UniffiWithHandle, 
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_constructor_passwordvalidator_new(
+    UniffiLib.uniffi_user_domain_fn_constructor_getusersusecaseimpl_new(
     
         _status)
 }
@@ -1422,7 +1289,7 @@ open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterf
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_locksmith_fn_free_passwordvalidator(handle, status)
+                UniffiLib.uniffi_user_domain_fn_free_getusersusecaseimpl(handle, status)
             }
         }
     }
@@ -1435,111 +1302,34 @@ open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterf
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_locksmith_fn_clone_passwordvalidator(handle, status)
+            UniffiLib.uniffi_user_domain_fn_clone_getusersusecaseimpl(handle, status)
         }
     }
 
     
     /**
-     * Returns an aggregated policy message if the password violates any rule.
-     * If all rules are satisfied, returns an empty string.
-     */override fun `oldPasswordPolicy`(`password`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_old_password_policy(
-        it,
-        FfiConverterString.lower(`password`),_status)
-}
-    }
-    )
-    }
-    
-
-    
+     * Execute the use case to get all users
+     * Returns UserDomainResultModel with Loaded, Empty, or Error state
+     * The use case logic determines which case to use based on business rules
+     */
     @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
-    override suspend fun `sayAfter`(`ms`: kotlin.ULong, `who`: kotlin.String) : kotlin.String {
+    override suspend fun `execute`() : UserDomainResultModel {
         return uniffiRustCallAsync(
         callWithHandle { uniffiHandle ->
-            UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_say_after(
+            UniffiLib.uniffi_user_domain_fn_method_getusersusecaseimpl_execute(
                 uniffiHandle,
-                FfiConverterULong.lower(`ms`),FfiConverterString.lower(`who`),
+                
             )
         },
-        { future, callback, continuation -> UniffiLib.ffi_locksmith_rust_future_poll_rust_buffer(future, callback, continuation) },
-        { future, continuation -> UniffiLib.ffi_locksmith_rust_future_complete_rust_buffer(future, continuation) },
-        { future -> UniffiLib.ffi_locksmith_rust_future_free_rust_buffer(future) },
+        { future, callback, continuation -> UniffiLib.ffi_user_domain_rust_future_poll_rust_buffer(future, callback, continuation) },
+        { future, continuation -> UniffiLib.ffi_user_domain_rust_future_complete_rust_buffer(future, continuation) },
+        { future -> UniffiLib.ffi_user_domain_rust_future_free_rust_buffer(future) },
         // lift function
-        { FfiConverterString.lift(it) },
+        { FfiConverterTypeUserDomainResultModel.lift(it) },
         // Error FFI converter
         UniffiNullRustCallStatusErrorHandler,
     )
     }
-
-    override fun `validate`(`password`: kotlin.String): PasswordValidation {
-            return FfiConverterTypePasswordValidation.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate(
-        it,
-        FfiConverterString.lower(`password`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `validatePasswordMessageNonLocalized`(`password`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_password_message_non_localized(
-        it,
-        FfiConverterString.lower(`password`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `validatePasswordsCountValid`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong {
-            return FfiConverterULong.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_count_valid(
-        it,
-        FfiConverterSequenceString.lower(`inputs`),FfiConverterUInt.lower(`rounds`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `validatePasswordsScoreRepeated`(`inputs`: List<kotlin.String>, `rounds`: kotlin.UInt): kotlin.ULong {
-            return FfiConverterULong.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_passwords_score_repeated(
-        it,
-        FfiConverterSequenceString.lower(`inputs`),FfiConverterUInt.lower(`rounds`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `validateWithMessage`(`password`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_method_passwordvalidator_validate_with_message(
-        it,
-        FfiConverterString.lower(`password`),_status)
-}
-    }
-    )
-    }
-    
 
     
 
@@ -1559,56 +1349,217 @@ open class PasswordValidator: Disposable, AutoCloseable, PasswordValidatorInterf
 /**
  * @suppress
  */
-public object FfiConverterTypePasswordValidator: FfiConverter<PasswordValidator, Long> {
-    override fun lower(value: PasswordValidator): Long {
+public object FfiConverterTypeGetUsersUseCaseImpl: FfiConverter<GetUsersUseCaseImpl, Long> {
+    override fun lower(value: GetUsersUseCaseImpl): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): PasswordValidator {
-        return PasswordValidator(UniffiWithHandle, value)
+    override fun lift(value: Long): GetUsersUseCaseImpl {
+        return GetUsersUseCaseImpl(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): PasswordValidator {
+    override fun read(buf: ByteBuffer): GetUsersUseCaseImpl {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: PasswordValidator) = 8UL
+    override fun allocationSize(value: GetUsersUseCaseImpl) = 8UL
 
-    override fun write(value: PasswordValidator, buf: ByteBuffer) {
+    override fun write(value: GetUsersUseCaseImpl, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
 
 
 
-
-enum class PasswordValidation {
+/**
+ * UserDomainModel - exposed via UniFFI for platform use
+ * All user-facing strings are generated in Rust and included in this model
+ * Only contains fields needed for presentation
+ */
+data class UserDomainModel (
+    var `id`: kotlin.ULong
+    , 
+    var `firstName`: kotlin.String
+    , 
+    var `lastName`: kotlin.String
+    , 
+    var `phone`: kotlin.String
+    , 
+    var `fullName`: kotlin.String
+    , 
+    var `imageUrl`: kotlin.String
+    , 
+    /**
+     * Age display string formatted as "X years old" - generated in Rust
+     */
+    var `ageDisplay`: kotlin.String
+    , 
+    /**
+     * Email display string formatted as "Email: user@example.com" - generated in Rust
+     */
+    var `emailDisplay`: kotlin.String
     
-    TOO_SHORT,
-    TOO_LONG,
-    NO_UPPERCASE,
-    NO_LOWERCASE,
-    NO_NUMBER,
-    NO_SYMBOL,
-    VALID;
+){
+    
+
+    
     companion object
 }
 
+/**
+ * @suppress
+ */
+public object FfiConverterTypeUserDomainModel: FfiConverterRustBuffer<UserDomainModel> {
+    override fun read(buf: ByteBuffer): UserDomainModel {
+        return UserDomainModel(
+            FfiConverterULong.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+            FfiConverterString.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: UserDomainModel) = (
+            FfiConverterULong.allocationSize(value.`id`) +
+            FfiConverterString.allocationSize(value.`firstName`) +
+            FfiConverterString.allocationSize(value.`lastName`) +
+            FfiConverterString.allocationSize(value.`phone`) +
+            FfiConverterString.allocationSize(value.`fullName`) +
+            FfiConverterString.allocationSize(value.`imageUrl`) +
+            FfiConverterString.allocationSize(value.`ageDisplay`) +
+            FfiConverterString.allocationSize(value.`emailDisplay`)
+    )
+
+    override fun write(value: UserDomainModel, buf: ByteBuffer) {
+            FfiConverterULong.write(value.`id`, buf)
+            FfiConverterString.write(value.`firstName`, buf)
+            FfiConverterString.write(value.`lastName`, buf)
+            FfiConverterString.write(value.`phone`, buf)
+            FfiConverterString.write(value.`fullName`, buf)
+            FfiConverterString.write(value.`imageUrl`, buf)
+            FfiConverterString.write(value.`ageDisplay`, buf)
+            FfiConverterString.write(value.`emailDisplay`, buf)
+    }
+}
+
+
+
+/**
+ * Result model for all user domain operations
+ * Represents three possible states: Loaded, Empty, or Error
+ *
+ * **Why this concrete type:**
+ * - UniFFI doesn't support generic types, so we need a concrete enum
+ * - UniFFI requires #[derive(uniffi::Enum)] for FFI bindings
+ */
+sealed class UserDomainResultModel {
+    
+    /**
+     * Operation succeeded with data (always a vector)
+     */
+    data class Loaded(
+        val `data`: List<UserDomainModel>) : UserDomainResultModel()
+        
+    {
+        
+
+        companion object
+    }
+    
+    /**
+     * Operation succeeded but returned empty data
+     */
+    data class Empty(
+        val `data`: EpmtyDataModel) : UserDomainResultModel()
+        
+    {
+        
+
+        companion object
+    }
+    
+    /**
+     * Operation failed with error information
+     */
+    data class Error(
+        val `display`: ErrorDisplay) : UserDomainResultModel()
+        
+    {
+        
+
+        companion object
+    }
+    
+
+    
+    companion object
+}
 
 /**
  * @suppress
  */
-public object FfiConverterTypePasswordValidation: FfiConverterRustBuffer<PasswordValidation> {
-    override fun read(buf: ByteBuffer) = try {
-        PasswordValidation.values()[buf.getInt() - 1]
-    } catch (e: IndexOutOfBoundsException) {
-        throw RuntimeException("invalid enum value, something is very wrong!!", e)
+public object FfiConverterTypeUserDomainResultModel : FfiConverterRustBuffer<UserDomainResultModel>{
+    override fun read(buf: ByteBuffer): UserDomainResultModel {
+        return when(buf.getInt()) {
+            1 -> UserDomainResultModel.Loaded(
+                FfiConverterSequenceTypeUserDomainModel.read(buf),
+                )
+            2 -> UserDomainResultModel.Empty(
+                FfiConverterTypeEpmtyDataModel.read(buf),
+                )
+            3 -> UserDomainResultModel.Error(
+                FfiConverterTypeErrorDisplay.read(buf),
+                )
+            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
+        }
     }
 
-    override fun allocationSize(value: PasswordValidation) = 4UL
+    override fun allocationSize(value: UserDomainResultModel) = when(value) {
+        is UserDomainResultModel.Loaded -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterSequenceTypeUserDomainModel.allocationSize(value.`data`)
+            )
+        }
+        is UserDomainResultModel.Empty -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeEpmtyDataModel.allocationSize(value.`data`)
+            )
+        }
+        is UserDomainResultModel.Error -> {
+            // Add the size for the Int that specifies the variant plus the size needed for all fields
+            (
+                4UL
+                + FfiConverterTypeErrorDisplay.allocationSize(value.`display`)
+            )
+        }
+    }
 
-    override fun write(value: PasswordValidation, buf: ByteBuffer) {
-        buf.putInt(value.ordinal + 1)
+    override fun write(value: UserDomainResultModel, buf: ByteBuffer) {
+        when(value) {
+            is UserDomainResultModel.Loaded -> {
+                buf.putInt(1)
+                FfiConverterSequenceTypeUserDomainModel.write(value.`data`, buf)
+                Unit
+            }
+            is UserDomainResultModel.Empty -> {
+                buf.putInt(2)
+                FfiConverterTypeEpmtyDataModel.write(value.`data`, buf)
+                Unit
+            }
+            is UserDomainResultModel.Error -> {
+                buf.putInt(3)
+                FfiConverterTypeErrorDisplay.write(value.`display`, buf)
+                Unit
+            }
+        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 }
 
@@ -1620,63 +1571,24 @@ public object FfiConverterTypePasswordValidation: FfiConverterRustBuffer<Passwor
 /**
  * @suppress
  */
-public object FfiConverterSequenceString: FfiConverterRustBuffer<List<kotlin.String>> {
-    override fun read(buf: ByteBuffer): List<kotlin.String> {
+public object FfiConverterSequenceTypeUserDomainModel: FfiConverterRustBuffer<List<UserDomainModel>> {
+    override fun read(buf: ByteBuffer): List<UserDomainModel> {
         val len = buf.getInt()
-        return List<kotlin.String>(len) {
-            FfiConverterString.read(buf)
+        return List<UserDomainModel>(len) {
+            FfiConverterTypeUserDomainModel.read(buf)
         }
     }
 
-    override fun allocationSize(value: List<kotlin.String>): ULong {
+    override fun allocationSize(value: List<UserDomainModel>): ULong {
         val sizeForLength = 4UL
-        val sizeForItems = value.map { FfiConverterString.allocationSize(it) }.sum()
+        val sizeForItems = value.map { FfiConverterTypeUserDomainModel.allocationSize(it) }.sum()
         return sizeForLength + sizeForItems
     }
 
-    override fun write(value: List<kotlin.String>, buf: ByteBuffer) {
+    override fun write(value: List<UserDomainModel>, buf: ByteBuffer) {
         buf.putInt(value.size)
         value.iterator().forEach {
-            FfiConverterString.write(it, buf)
-        }
-    }
-}
-
-
-
-
-/**
- * @suppress
- */
-public object FfiConverterMapStringString: FfiConverterRustBuffer<Map<kotlin.String, kotlin.String>> {
-    override fun read(buf: ByteBuffer): Map<kotlin.String, kotlin.String> {
-        val len = buf.getInt()
-        return buildMap<kotlin.String, kotlin.String>(len) {
-            repeat(len) {
-                val k = FfiConverterString.read(buf)
-                val v = FfiConverterString.read(buf)
-                this[k] = v
-            }
-        }
-    }
-
-    override fun allocationSize(value: Map<kotlin.String, kotlin.String>): ULong {
-        val spaceForMapSize = 4UL
-        val spaceForChildren = value.map { (k, v) ->
-            FfiConverterString.allocationSize(k) +
-            FfiConverterString.allocationSize(v)
-        }.sum()
-        return spaceForMapSize + spaceForChildren
-    }
-
-    override fun write(value: Map<kotlin.String, kotlin.String>, buf: ByteBuffer) {
-        buf.putInt(value.size)
-        // The parens on `(k, v)` here ensure we're calling the right method,
-        // which is important for compatibility with older android devices.
-        // Ref https://blog.danlew.net/2017/03/16/kotlin-puzzler-whose-line-is-it-anyways/
-        value.forEach { (k, v) ->
-            FfiConverterString.write(k, buf)
-            FfiConverterString.write(v, buf)
+            FfiConverterTypeUserDomainModel.write(it, buf)
         }
     }
 }
@@ -1687,111 +1599,9 @@ public object FfiConverterMapStringString: FfiConverterRustBuffer<Map<kotlin.Str
 
 
 
- fun `add`(`a`: kotlin.ULong, `b`: kotlin.ULong): kotlin.ULong {
-            return FfiConverterULong.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_add(
-    
-        FfiConverterULong.lower(`a`),FfiConverterULong.lower(`b`),_status)
-}
-    )
-    }
-    
- fun `difference`(`a`: kotlin.ULong, `b`: kotlin.ULong): kotlin.ULong {
-            return FfiConverterULong.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_difference(
-    
-        FfiConverterULong.lower(`a`),FfiConverterULong.lower(`b`),_status)
-}
-    )
-    }
-    
- fun `getLocalizedText`(`key`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_get_localized_text(
-    
-        FfiConverterString.lower(`key`),_status)
-}
-    )
-    }
-    
- fun `getLocalizedTextWithParams`(`key`: kotlin.String, `params`: Map<kotlin.String, kotlin.String>): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_get_localized_text_with_params(
-    
-        FfiConverterString.lower(`key`),FfiConverterMapStringString.lower(`params`),_status)
-}
-    )
-    }
-    
- fun `getRustDemoTitle`(`name`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_get_rust_demo_title(
-    
-        FfiConverterString.lower(`name`),_status)
-}
-    )
-    }
-    
- fun `getTranslatedText`(`key`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_get_translated_text(
-    
-        FfiConverterString.lower(`key`),_status)
-}
-    )
-    }
-    
- fun `initLocalization`()
-        = 
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_init_localization(
-    
-        _status)
-}
-    
-    
- fun `initializeLocalization`()
-        = 
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_initialize_localization(
-    
-        _status)
-}
-    
-    
- fun `setAppLocale`(`locale`: kotlin.String)
-        = 
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_set_app_locale(
-    
-        FfiConverterString.lower(`locale`),_status)
-}
-    
-    
- fun `setGlobalLocale`(`locale`: kotlin.String)
-        = 
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_set_global_locale(
-    
-        FfiConverterString.lower(`locale`),_status)
-}
-    
-    
- fun `validatePasswordLocalized`(`password`: kotlin.String): kotlin.String {
-            return FfiConverterString.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_locksmith_fn_func_validate_password_localized(
-    
-        FfiConverterString.lower(`password`),_status)
-}
-    )
-    }
-    
+
+
+
+
 
 

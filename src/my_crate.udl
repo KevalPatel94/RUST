@@ -11,10 +11,6 @@ enum PasswordValidation {
 };
 
 // User Domain Layer - exposed for platform ViewModels
-enum DomainError {
-    Error { record ErrorDisplay display };
-}
-
 record ErrorDisplay {
     string title;
     string subtitle;
@@ -24,17 +20,30 @@ record UserDomainModel {
     u64 id;
     string first_name;
     string last_name;
-    string email;
     string phone;
-    u32 age;
     string full_name;
     string image_url;
+    string age_display;
+    string email_display;
+}
+
+// Single result model for all user domain operations
+// Always returns Vec<UserDomainModel> for Loaded case
+// Empty case uses EpmtyDataModel, Error case uses ErrorDisplay
+// Platforms check the variant instead of using try/catch
+record EpmtyDataModel {
+    string title;
+    string subtitle;
+    string button_title;
+}
+
+enum UserDomainResultModel {
+    Loaded { data sequence<UserDomainModel> data };
+    Empty { data EpmtyDataModel data };
+    Error { record ErrorDisplay display };
 }
 
 object GetUsersUseCaseImpl {
-    constructor() throws DomainError;
-    async Result<sequence<UserDomainModel>, DomainError> execute();
-    async Result<UserDomainModel, DomainError> execute_by_id(u64 id);
-    // Convert DomainError to ErrorDisplay - platforms just need title/subtitle
-    ErrorDisplay to_error_display(DomainError error);
+    constructor();
+    async UserDomainResultModel execute();
 };

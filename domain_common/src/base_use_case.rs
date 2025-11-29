@@ -17,7 +17,10 @@ impl BaseUseCase {
     pub fn new() -> Result<Self, DomainError> {
         let runtime = Runtime::new()
             .map_err(|_| DomainError::Error {
-                display: ErrorDisplay::generic(),
+                display: ErrorDisplay {
+                    title: "Something Went Wrong".to_string(),
+                    subtitle: "An unexpected error occurred. Please try again.".to_string(),
+                },
             })?;
         
         Ok(Self {
@@ -37,7 +40,10 @@ impl BaseUseCase {
         handle.spawn(f)
             .await
             .map_err(|_| DomainError::Error {
-                display: ErrorDisplay::generic(),
+                display: ErrorDisplay {
+                    title: "Something Went Wrong".to_string(),
+                    subtitle: "An unexpected error occurred. Please try again.".to_string(),
+                },
             })?
             .map_err(DomainError::from)
     }

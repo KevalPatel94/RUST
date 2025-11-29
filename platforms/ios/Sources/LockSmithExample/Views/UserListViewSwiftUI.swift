@@ -13,8 +13,11 @@ struct UserListViewSwiftUI: View {
                         .scaleEffect(1.5)
                 } else if viewModel.showError {
                     errorView
-                } else if viewModel.users.isEmpty {
+                } else if viewModel.showEmptyState {
                     emptyView
+                } else if viewModel.users.isEmpty {
+                    ProgressView()
+                        .scaleEffect(1.5)
                 } else {
                     userListView
                 }
@@ -43,10 +46,29 @@ struct UserListViewSwiftUI: View {
             Image(systemName: "person.3.fill")
                 .font(.system(size: 50))
                 .foregroundColor(.secondary)
-            Text("No users found")
-                .font(.title3)
-                .foregroundColor(.secondary)
+            
+            if let title = viewModel.emptyStateTitle {
+                Text(title)
+                    .font(.title3)
+                    .foregroundColor(.primary)
+            }
+            
+            if let subtitle = viewModel.emptyStateSubtitle {
+                Text(subtitle)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
+            
+            if let buttonTitle = viewModel.emptyStateButtonTitle {
+                Button(buttonTitle) {
+                    viewModel.refresh()
+                }
+                .buttonStyle(.borderedProminent)
+            }
         }
+        .padding()
     }
     
     private var errorView: some View {

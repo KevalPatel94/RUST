@@ -352,19 +352,29 @@ private func uniffiTraitInterfaceCallWithError<T, E>(
         callStatus.pointee.errorBuf = FfiConverterString.lower(String(describing: error))
     }
 }
+// Initial value and increment amount for handles. 
+// These ensure that SWIFT handles always have the lowest bit set
+fileprivate let UNIFFI_HANDLEMAP_INITIAL: UInt64 = 1
+fileprivate let UNIFFI_HANDLEMAP_DELTA: UInt64 = 2
+
 fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
     // All mutation happens with this lock held, which is why we implement @unchecked Sendable.
     private let lock = NSLock()
     private var map: [UInt64: T] = [:]
-    private var currentHandle: UInt64 = 1
+    private var currentHandle: UInt64 = UNIFFI_HANDLEMAP_INITIAL
 
     func insert(obj: T) -> UInt64 {
         lock.withLock {
-            let handle = currentHandle
-            currentHandle += 1
-            map[handle] = obj
-            return handle
+            return doInsert(obj)
         }
+    }
+
+    // Low-level insert function, this assumes `lock` is held.
+    private func doInsert(_ obj: T) -> UInt64 {
+        let handle = currentHandle
+        currentHandle += UNIFFI_HANDLEMAP_DELTA
+        map[handle] = obj
+        return handle
     }
 
      func get(handle: UInt64) throws -> T {
@@ -373,6 +383,15 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
                 throw UniffiInternalError.unexpectedStaleHandle
             }
             return obj
+        }
+    }
+
+     func clone(handle: UInt64) throws -> UInt64 {
+        try lock.withLock {
+            guard let obj = map[handle] else {
+                throw UniffiInternalError.unexpectedStaleHandle
+            }
+            return doInsert(obj)
         }
     }
 
@@ -439,11 +458,67 @@ fileprivate struct FfiConverterString: FfiConverter {
 }
 
 
+public struct EpmtyDataModel: Equatable, Hashable {
+    public var title: String
+    public var subtitle: String
+    public var buttonTitle: String
+
+    // Default memberwise initializers are never public by default, so we
+    // declare one manually.
+    public init(title: String, subtitle: String, buttonTitle: String) {
+        self.title = title
+        self.subtitle = subtitle
+        self.buttonTitle = buttonTitle
+    }
+
+    
+}
+
+#if compiler(>=6)
+extension EpmtyDataModel: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeEpmtyDataModel: FfiConverterRustBuffer {
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> EpmtyDataModel {
+        return
+            try EpmtyDataModel(
+                title: FfiConverterString.read(from: &buf), 
+                subtitle: FfiConverterString.read(from: &buf), 
+                buttonTitle: FfiConverterString.read(from: &buf)
+        )
+    }
+
+    public static func write(_ value: EpmtyDataModel, into buf: inout [UInt8]) {
+        FfiConverterString.write(value.title, into: &buf)
+        FfiConverterString.write(value.subtitle, into: &buf)
+        FfiConverterString.write(value.buttonTitle, into: &buf)
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeEpmtyDataModel_lift(_ buf: RustBuffer) throws -> EpmtyDataModel {
+    return try FfiConverterTypeEpmtyDataModel.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeEpmtyDataModel_lower(_ value: EpmtyDataModel) -> RustBuffer {
+    return FfiConverterTypeEpmtyDataModel.lower(value)
+}
+
+
 /**
  * Simple error display configuration for platforms
  * Contains only what platforms need to display errors
  */
-public struct ErrorDisplay {
+public struct ErrorDisplay: Equatable, Hashable {
     public var title: String
     public var subtitle: String
 
@@ -453,31 +528,13 @@ public struct ErrorDisplay {
         self.title = title
         self.subtitle = subtitle
     }
+
+    
 }
 
 #if compiler(>=6)
 extension ErrorDisplay: Sendable {}
 #endif
-
-
-extension ErrorDisplay: Equatable, Hashable {
-    public static func ==(lhs: ErrorDisplay, rhs: ErrorDisplay) -> Bool {
-        if lhs.title != rhs.title {
-            return false
-        }
-        if lhs.subtitle != rhs.subtitle {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(title)
-        hasher.combine(subtitle)
-    }
-}
-
-
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
@@ -518,14 +575,25 @@ public func FfiConverterTypeErrorDisplay_lower(_ value: ErrorDisplay) -> RustBuf
  * Uses enum for UniFFI compatibility (Records can't be used as error types in Result)
  * This is just a carrier - platforms convert it to ErrorDisplay to get title/subtitle
  */
-public enum DomainError: Swift.Error {
+public enum DomainError: Swift.Error, Equatable, Hashable, Foundation.LocalizedError {
 
     
     
     case Error(display: ErrorDisplay
     )
+
+    
+
+    
+    public var errorDescription: String? {
+        String(reflecting: self)
+    }
+    
 }
 
+#if compiler(>=6)
+extension DomainError: Sendable {}
+#endif
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
@@ -578,21 +646,6 @@ public func FfiConverterTypeDomainError_lower(_ value: DomainError) -> RustBuffe
     return FfiConverterTypeDomainError.lower(value)
 }
 
-
-extension DomainError: Equatable, Hashable {}
-
-
-
-
-extension DomainError: Foundation.LocalizedError {
-    public var errorDescription: String? {
-        String(reflecting: self)
-    }
-}
-
-
-
-
 private enum InitializationResult {
     case ok
     case contractVersionMismatch
@@ -602,7 +655,7 @@ private enum InitializationResult {
 // the code inside is only computed once.
 private let initializationResult: InitializationResult = {
     // Get the bindings contract version from our ComponentInterface
-    let bindings_contract_version = 29
+    let bindings_contract_version = 30
     // Get the scaffolding contract version by calling the into the dylib
     let scaffolding_contract_version = ffi_domain_common_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {

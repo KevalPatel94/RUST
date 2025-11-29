@@ -22,6 +22,10 @@ final class UserListViewModelSwiftUI: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var showError: Bool = false
+    @Published var emptyStateTitle: String?
+    @Published var emptyStateSubtitle: String?
+    @Published var emptyStateButtonTitle: String?
+    @Published var showEmptyState: Bool = false
     
     // MARK: - Private
     private let useCase: GetUsersUseCaseImpl
@@ -37,32 +41,46 @@ final class UserListViewModelSwiftUI: ObservableObject {
         isLoading = true
         errorMessage = nil
         showError = false
+        showEmptyState = false
+        emptyStateTitle = nil
+        emptyStateSubtitle = nil
+        emptyStateButtonTitle = nil
         
         Task { @MainActor in
-            do {
-                let domainUsers = try await useCase.execute()
+            let result = await useCase.execute()
+            
+            switch result {
+            case .loaded(let domainUsers):
                 let presentationUsers = domainUsers.map { domainUser in
                     UserPresentationModel(
                         id: domainUser.id,
                         displayName: domainUser.fullName,
-                        email: domainUser.email,
+                        email: domainUser.emailDisplay,
                         phone: domainUser.phone,
-                        age: domainUser.age,
-                        ageDisplay: "\(domainUser.age) years old",
+                        ageDisplay: domainUser.ageDisplay,
                         imageUrl: domainUser.imageUrl
                     )
                 }
-                
                 self.users = presentationUsers
                 self.isLoading = false
-            } catch let error as DomainError {
+                self.showError = false
+                self.showEmptyState = false
+                
+            case .empty(let emptyData):
+                // Empty case has EpmtyDataModel with title/subtitle/buttonTitle
+                self.users = []
                 self.isLoading = false
-                self.errorMessage = formatError(error)
-                self.showError = true
-            } catch {
+                self.showError = false
+                self.emptyStateTitle = emptyData.title
+                self.emptyStateSubtitle = emptyData.subtitle
+                self.emptyStateButtonTitle = emptyData.buttonTitle
+                self.showEmptyState = true
+                
+            case .error(let errorDisplay):
                 self.isLoading = false
-                self.errorMessage = formatError(error)
+                self.errorMessage = formatError(errorDisplay)
                 self.showError = true
+                self.showEmptyState = false
             }
         }
     }
@@ -72,13 +90,9 @@ final class UserListViewModelSwiftUI: ObservableObject {
     }
     
     // MARK: - Private Methods
-    private func formatError(_ error: Error) -> String {
-        // Convert DomainError to ErrorDisplay - platforms just need title/subtitle
-        if let domainError = error as? DomainError {
-            let errorDisplay = useCase.toErrorDisplay(error: domainError)
-            return "\(errorDisplay.title): \(errorDisplay.subtitle)"
-        }
-        return error.localizedDescription
+    private func formatError(_ errorDisplay: ErrorDisplay) -> String {
+        // Platforms directly receive ErrorDisplay - no conversion needed
+        return "\(errorDisplay.title): \(errorDisplay.subtitle)"
     }
 }
 

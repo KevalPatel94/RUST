@@ -352,19 +352,29 @@ private func uniffiTraitInterfaceCallWithError<T, E>(
         callStatus.pointee.errorBuf = FfiConverterString.lower(String(describing: error))
     }
 }
+// Initial value and increment amount for handles. 
+// These ensure that SWIFT handles always have the lowest bit set
+fileprivate let UNIFFI_HANDLEMAP_INITIAL: UInt64 = 1
+fileprivate let UNIFFI_HANDLEMAP_DELTA: UInt64 = 2
+
 fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
     // All mutation happens with this lock held, which is why we implement @unchecked Sendable.
     private let lock = NSLock()
     private var map: [UInt64: T] = [:]
-    private var currentHandle: UInt64 = 1
+    private var currentHandle: UInt64 = UNIFFI_HANDLEMAP_INITIAL
 
     func insert(obj: T) -> UInt64 {
         lock.withLock {
-            let handle = currentHandle
-            currentHandle += 1
-            map[handle] = obj
-            return handle
+            return doInsert(obj)
         }
+    }
+
+    // Low-level insert function, this assumes `lock` is held.
+    private func doInsert(_ obj: T) -> UInt64 {
+        let handle = currentHandle
+        currentHandle += UNIFFI_HANDLEMAP_DELTA
+        map[handle] = obj
+        return handle
     }
 
      func get(handle: UInt64) throws -> T {
@@ -373,6 +383,15 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
                 throw UniffiInternalError.unexpectedStaleHandle
             }
             return obj
+        }
+    }
+
+     func clone(handle: UInt64) throws -> UInt64 {
+        try lock.withLock {
+            guard let obj = map[handle] else {
+                throw UniffiInternalError.unexpectedStaleHandle
+            }
+            return doInsert(obj)
         }
     }
 
@@ -396,22 +415,6 @@ fileprivate final class UniffiHandleMap<T>: @unchecked Sendable {
 
 // Public interface members begin here.
 
-
-#if swift(>=5.8)
-@_documentation(visibility: private)
-#endif
-fileprivate struct FfiConverterUInt32: FfiConverterPrimitive {
-    typealias FfiType = UInt32
-    typealias SwiftType = UInt32
-
-    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UInt32 {
-        return try lift(readInt(&buf))
-    }
-
-    public static func write(_ value: SwiftType, into buf: inout [UInt8]) {
-        writeInt(&buf, lower(value))
-    }
-}
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
@@ -482,20 +485,10 @@ public protocol GetUsersUseCaseImplProtocol: AnyObject, Sendable {
     
     /**
      * Execute the use case to get all users
-     * Returns UserDomainModel for FFI compatibility
+     * Returns UserDomainResultModel with Loaded, Empty, or Error state
+     * The use case logic determines which case to use based on business rules
      */
-    func execute() async throws  -> [UserDomainModel]
-    
-    /**
-     * Execute the use case to get a user by ID
-     * Returns UserDomainModel for FFI compatibility
-     */
-    func executeById(id: UInt64) async throws  -> UserDomainModel
-    
-    /**
-     * Convert DomainError to ErrorDisplay - platforms use this to get title/subtitle
-     */
-    func toErrorDisplay(error: DomainError)  -> ErrorDisplay
+    func execute() async  -> UserDomainResultModel
     
 }
 /**
@@ -504,13 +497,13 @@ public protocol GetUsersUseCaseImplProtocol: AnyObject, Sendable {
  * Uses BaseUseCase for common runtime and error handling concerns
  */
 open class GetUsersUseCaseImpl: GetUsersUseCaseImplProtocol, @unchecked Sendable {
-    fileprivate let pointer: UnsafeMutableRawPointer!
+    fileprivate let handle: UInt64
 
-    /// Used to instantiate a [FFIObject] without an actual pointer, for fakes in tests, mostly.
+    /// Used to instantiate a [FFIObject] without an actual handle, for fakes in tests, mostly.
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public struct NoPointer {
+    public struct NoHandle {
         public init() {}
     }
 
@@ -520,46 +513,42 @@ open class GetUsersUseCaseImpl: GetUsersUseCaseImplProtocol, @unchecked Sendable
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    required public init(unsafeFromRawPointer pointer: UnsafeMutableRawPointer) {
-        self.pointer = pointer
+    required public init(unsafeFromHandle handle: UInt64) {
+        self.handle = handle
     }
 
     // This constructor can be used to instantiate a fake object.
-    // - Parameter noPointer: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
+    // - Parameter noHandle: Placeholder value so we can have a constructor separate from the default empty one that may be implemented for classes extending [FFIObject].
     //
     // - Warning:
-    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing [Pointer] the FFI lower functions will crash.
+    //     Any object instantiated with this constructor cannot be passed to an actual Rust-backed object. Since there isn't a backing handle the FFI lower functions will crash.
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public init(noPointer: NoPointer) {
-        self.pointer = nil
+    public init(noHandle: NoHandle) {
+        self.handle = 0
     }
 
 #if swift(>=5.8)
     @_documentation(visibility: private)
 #endif
-    public func uniffiClonePointer() -> UnsafeMutableRawPointer {
-        return try! rustCall { uniffi_user_domain_fn_clone_getusersusecaseimpl(self.pointer, $0) }
+    public func uniffiCloneHandle() -> UInt64 {
+        return try! rustCall { uniffi_user_domain_fn_clone_getusersusecaseimpl(self.handle, $0) }
     }
     /**
      * Constructor - creates a new GetUsersUseCaseImpl using BaseUseCase
      */
-public convenience init()throws  {
-    let pointer =
-        try rustCallWithError(FfiConverterTypeDomainError_lift) {
+public convenience init() {
+    let handle =
+        try! rustCall() {
     uniffi_user_domain_fn_constructor_getusersusecaseimpl_new($0
     )
 }
-    self.init(unsafeFromRawPointer: pointer)
+    self.init(unsafeFromHandle: handle)
 }
 
     deinit {
-        guard let pointer = pointer else {
-            return
-        }
-
-        try! rustCall { uniffi_user_domain_fn_free_getusersusecaseimpl(pointer, $0) }
+        try! rustCall { uniffi_user_domain_fn_free_getusersusecaseimpl(handle, $0) }
     }
 
     
@@ -567,58 +556,29 @@ public convenience init()throws  {
     
     /**
      * Execute the use case to get all users
-     * Returns UserDomainModel for FFI compatibility
+     * Returns UserDomainResultModel with Loaded, Empty, or Error state
+     * The use case logic determines which case to use based on business rules
      */
-open func execute()async throws  -> [UserDomainModel]  {
+open func execute()async  -> UserDomainResultModel  {
     return
-        try  await uniffiRustCallAsync(
+        try!  await uniffiRustCallAsync(
             rustFutureFunc: {
                 uniffi_user_domain_fn_method_getusersusecaseimpl_execute(
-                    self.uniffiClonePointer()
+                    self.uniffiCloneHandle()
                     
                 )
             },
             pollFunc: ffi_user_domain_rust_future_poll_rust_buffer,
             completeFunc: ffi_user_domain_rust_future_complete_rust_buffer,
             freeFunc: ffi_user_domain_rust_future_free_rust_buffer,
-            liftFunc: FfiConverterSequenceTypeUserDomainModel.lift,
-            errorHandler: FfiConverterTypeDomainError_lift
+            liftFunc: FfiConverterTypeUserDomainResultModel_lift,
+            errorHandler: nil
+            
         )
-}
-    
-    /**
-     * Execute the use case to get a user by ID
-     * Returns UserDomainModel for FFI compatibility
-     */
-open func executeById(id: UInt64)async throws  -> UserDomainModel  {
-    return
-        try  await uniffiRustCallAsync(
-            rustFutureFunc: {
-                uniffi_user_domain_fn_method_getusersusecaseimpl_execute_by_id(
-                    self.uniffiClonePointer(),
-                    FfiConverterUInt64.lower(id)
-                )
-            },
-            pollFunc: ffi_user_domain_rust_future_poll_rust_buffer,
-            completeFunc: ffi_user_domain_rust_future_complete_rust_buffer,
-            freeFunc: ffi_user_domain_rust_future_free_rust_buffer,
-            liftFunc: FfiConverterTypeUserDomainModel_lift,
-            errorHandler: FfiConverterTypeDomainError_lift
-        )
-}
-    
-    /**
-     * Convert DomainError to ErrorDisplay - platforms use this to get title/subtitle
-     */
-open func toErrorDisplay(error: DomainError) -> ErrorDisplay  {
-    return try!  FfiConverterTypeErrorDisplay_lift(try! rustCall() {
-    uniffi_user_domain_fn_method_getusersusecaseimpl_to_error_display(self.uniffiClonePointer(),
-        FfiConverterTypeDomainError_lower(error),$0
-    )
-})
 }
     
 
+    
 }
 
 
@@ -626,33 +586,24 @@ open func toErrorDisplay(error: DomainError) -> ErrorDisplay  {
 @_documentation(visibility: private)
 #endif
 public struct FfiConverterTypeGetUsersUseCaseImpl: FfiConverter {
-
-    typealias FfiType = UnsafeMutableRawPointer
+    typealias FfiType = UInt64
     typealias SwiftType = GetUsersUseCaseImpl
 
-    public static func lift(_ pointer: UnsafeMutableRawPointer) throws -> GetUsersUseCaseImpl {
-        return GetUsersUseCaseImpl(unsafeFromRawPointer: pointer)
+    public static func lift(_ handle: UInt64) throws -> GetUsersUseCaseImpl {
+        return GetUsersUseCaseImpl(unsafeFromHandle: handle)
     }
 
-    public static func lower(_ value: GetUsersUseCaseImpl) -> UnsafeMutableRawPointer {
-        return value.uniffiClonePointer()
+    public static func lower(_ value: GetUsersUseCaseImpl) -> UInt64 {
+        return value.uniffiCloneHandle()
     }
 
     public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> GetUsersUseCaseImpl {
-        let v: UInt64 = try readInt(&buf)
-        // The Rust code won't compile if a pointer won't fit in a UInt64.
-        // We have to go via `UInt` because that's the thing that's the size of a pointer.
-        let ptr = UnsafeMutableRawPointer(bitPattern: UInt(truncatingIfNeeded: v))
-        if (ptr == nil) {
-            throw UniffiInternalError.unexpectedNullPointer
-        }
-        return try lift(ptr!)
+        let handle: UInt64 = try readInt(&buf)
+        return try lift(handle)
     }
 
     public static func write(_ value: GetUsersUseCaseImpl, into buf: inout [UInt8]) {
-        // This fiddling is because `Int` is the thing that's the same size as a pointer.
-        // The Rust code won't compile if a pointer won't fit in a `UInt64`.
-        writeInt(&buf, UInt64(bitPattern: Int64(Int(bitPattern: lower(value)))))
+        writeInt(&buf, lower(value))
     }
 }
 
@@ -660,14 +611,14 @@ public struct FfiConverterTypeGetUsersUseCaseImpl: FfiConverter {
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeGetUsersUseCaseImpl_lift(_ pointer: UnsafeMutableRawPointer) throws -> GetUsersUseCaseImpl {
-    return try FfiConverterTypeGetUsersUseCaseImpl.lift(pointer)
+public func FfiConverterTypeGetUsersUseCaseImpl_lift(_ handle: UInt64) throws -> GetUsersUseCaseImpl {
+    return try FfiConverterTypeGetUsersUseCaseImpl.lift(handle)
 }
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
 #endif
-public func FfiConverterTypeGetUsersUseCaseImpl_lower(_ value: GetUsersUseCaseImpl) -> UnsafeMutableRawPointer {
+public func FfiConverterTypeGetUsersUseCaseImpl_lower(_ value: GetUsersUseCaseImpl) -> UInt64 {
     return FfiConverterTypeGetUsersUseCaseImpl.lower(value)
 }
 
@@ -676,78 +627,50 @@ public func FfiConverterTypeGetUsersUseCaseImpl_lower(_ value: GetUsersUseCaseIm
 
 /**
  * UserDomainModel - exposed via UniFFI for platform use
+ * All user-facing strings are generated in Rust and included in this model
+ * Only contains fields needed for presentation
  */
-public struct UserDomainModel {
+public struct UserDomainModel: Equatable, Hashable {
     public var id: UInt64
     public var firstName: String
     public var lastName: String
-    public var email: String
     public var phone: String
-    public var age: UInt32
     public var fullName: String
     public var imageUrl: String
+    /**
+     * Age display string formatted as "X years old" - generated in Rust
+     */
+    public var ageDisplay: String
+    /**
+     * Email display string formatted as "Email: user@example.com" - generated in Rust
+     */
+    public var emailDisplay: String
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(id: UInt64, firstName: String, lastName: String, email: String, phone: String, age: UInt32, fullName: String, imageUrl: String) {
+    public init(id: UInt64, firstName: String, lastName: String, phone: String, fullName: String, imageUrl: String, 
+        /**
+         * Age display string formatted as "X years old" - generated in Rust
+         */ageDisplay: String, 
+        /**
+         * Email display string formatted as "Email: user@example.com" - generated in Rust
+         */emailDisplay: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
-        self.email = email
         self.phone = phone
-        self.age = age
         self.fullName = fullName
         self.imageUrl = imageUrl
+        self.ageDisplay = ageDisplay
+        self.emailDisplay = emailDisplay
     }
+
+    
 }
 
 #if compiler(>=6)
 extension UserDomainModel: Sendable {}
 #endif
-
-
-extension UserDomainModel: Equatable, Hashable {
-    public static func ==(lhs: UserDomainModel, rhs: UserDomainModel) -> Bool {
-        if lhs.id != rhs.id {
-            return false
-        }
-        if lhs.firstName != rhs.firstName {
-            return false
-        }
-        if lhs.lastName != rhs.lastName {
-            return false
-        }
-        if lhs.email != rhs.email {
-            return false
-        }
-        if lhs.phone != rhs.phone {
-            return false
-        }
-        if lhs.age != rhs.age {
-            return false
-        }
-        if lhs.fullName != rhs.fullName {
-            return false
-        }
-        if lhs.imageUrl != rhs.imageUrl {
-            return false
-        }
-        return true
-    }
-
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-        hasher.combine(firstName)
-        hasher.combine(lastName)
-        hasher.combine(email)
-        hasher.combine(phone)
-        hasher.combine(age)
-        hasher.combine(fullName)
-        hasher.combine(imageUrl)
-    }
-}
-
-
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
@@ -759,11 +682,11 @@ public struct FfiConverterTypeUserDomainModel: FfiConverterRustBuffer {
                 id: FfiConverterUInt64.read(from: &buf), 
                 firstName: FfiConverterString.read(from: &buf), 
                 lastName: FfiConverterString.read(from: &buf), 
-                email: FfiConverterString.read(from: &buf), 
                 phone: FfiConverterString.read(from: &buf), 
-                age: FfiConverterUInt32.read(from: &buf), 
                 fullName: FfiConverterString.read(from: &buf), 
-                imageUrl: FfiConverterString.read(from: &buf)
+                imageUrl: FfiConverterString.read(from: &buf), 
+                ageDisplay: FfiConverterString.read(from: &buf), 
+                emailDisplay: FfiConverterString.read(from: &buf)
         )
     }
 
@@ -771,11 +694,11 @@ public struct FfiConverterTypeUserDomainModel: FfiConverterRustBuffer {
         FfiConverterUInt64.write(value.id, into: &buf)
         FfiConverterString.write(value.firstName, into: &buf)
         FfiConverterString.write(value.lastName, into: &buf)
-        FfiConverterString.write(value.email, into: &buf)
         FfiConverterString.write(value.phone, into: &buf)
-        FfiConverterUInt32.write(value.age, into: &buf)
         FfiConverterString.write(value.fullName, into: &buf)
         FfiConverterString.write(value.imageUrl, into: &buf)
+        FfiConverterString.write(value.ageDisplay, into: &buf)
+        FfiConverterString.write(value.emailDisplay, into: &buf)
     }
 }
 
@@ -793,6 +716,104 @@ public func FfiConverterTypeUserDomainModel_lift(_ buf: RustBuffer) throws -> Us
 public func FfiConverterTypeUserDomainModel_lower(_ value: UserDomainModel) -> RustBuffer {
     return FfiConverterTypeUserDomainModel.lower(value)
 }
+
+// Note that we don't yet support `indirect` for enums.
+// See https://github.com/mozilla/uniffi-rs/issues/396 for further discussion.
+/**
+ * Result model for all user domain operations
+ * Represents three possible states: Loaded, Empty, or Error
+ *
+ * **Why this concrete type:**
+ * - UniFFI doesn't support generic types, so we need a concrete enum
+ * - UniFFI requires #[derive(uniffi::Enum)] for FFI bindings
+ */
+
+public enum UserDomainResultModel: Equatable, Hashable {
+    
+    /**
+     * Operation succeeded with data (always a vector)
+     */
+    case loaded(data: [UserDomainModel]
+    )
+    /**
+     * Operation succeeded but returned empty data
+     */
+    case empty(data: EpmtyDataModel
+    )
+    /**
+     * Operation failed with error information
+     */
+    case error(display: ErrorDisplay
+    )
+
+
+
+}
+
+#if compiler(>=6)
+extension UserDomainResultModel: Sendable {}
+#endif
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public struct FfiConverterTypeUserDomainResultModel: FfiConverterRustBuffer {
+    typealias SwiftType = UserDomainResultModel
+
+    public static func read(from buf: inout (data: Data, offset: Data.Index)) throws -> UserDomainResultModel {
+        let variant: Int32 = try readInt(&buf)
+        switch variant {
+        
+        case 1: return .loaded(data: try FfiConverterSequenceTypeUserDomainModel.read(from: &buf)
+        )
+        
+        case 2: return .empty(data: try FfiConverterTypeEpmtyDataModel.read(from: &buf)
+        )
+        
+        case 3: return .error(display: try FfiConverterTypeErrorDisplay.read(from: &buf)
+        )
+        
+        default: throw UniffiInternalError.unexpectedEnumCase
+        }
+    }
+
+    public static func write(_ value: UserDomainResultModel, into buf: inout [UInt8]) {
+        switch value {
+        
+        
+        case let .loaded(data):
+            writeInt(&buf, Int32(1))
+            FfiConverterSequenceTypeUserDomainModel.write(data, into: &buf)
+            
+        
+        case let .empty(data):
+            writeInt(&buf, Int32(2))
+            FfiConverterTypeEpmtyDataModel.write(data, into: &buf)
+            
+        
+        case let .error(display):
+            writeInt(&buf, Int32(3))
+            FfiConverterTypeErrorDisplay.write(display, into: &buf)
+            
+        }
+    }
+}
+
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUserDomainResultModel_lift(_ buf: RustBuffer) throws -> UserDomainResultModel {
+    return try FfiConverterTypeUserDomainResultModel.lift(buf)
+}
+
+#if swift(>=5.8)
+@_documentation(visibility: private)
+#endif
+public func FfiConverterTypeUserDomainResultModel_lower(_ value: UserDomainResultModel) -> RustBuffer {
+    return FfiConverterTypeUserDomainResultModel.lower(value)
+}
+
 
 #if swift(>=5.8)
 @_documentation(visibility: private)
@@ -819,7 +840,7 @@ fileprivate struct FfiConverterSequenceTypeUserDomainModel: FfiConverterRustBuff
     }
 }
 private let UNIFFI_RUST_FUTURE_POLL_READY: Int8 = 0
-private let UNIFFI_RUST_FUTURE_POLL_MAYBE_READY: Int8 = 1
+private let UNIFFI_RUST_FUTURE_POLL_WAKE: Int8 = 1
 
 fileprivate let uniffiContinuationHandleMap = UniffiHandleMap<UnsafeContinuation<Int8, Never>>()
 
@@ -843,7 +864,9 @@ fileprivate func uniffiRustCallAsync<F, T>(
         pollResult = await withUnsafeContinuation {
             pollFunc(
                 rustFuture,
-                uniffiFutureContinuationCallback,
+                { handle, pollResult in
+                    uniffiFutureContinuationCallback(handle: handle, pollResult: pollResult)
+                },
                 uniffiContinuationHandleMap.insert(obj: $0)
             )
         }
@@ -874,22 +897,16 @@ private enum InitializationResult {
 // the code inside is only computed once.
 private let initializationResult: InitializationResult = {
     // Get the bindings contract version from our ComponentInterface
-    let bindings_contract_version = 29
+    let bindings_contract_version = 30
     // Get the scaffolding contract version by calling the into the dylib
     let scaffolding_contract_version = ffi_user_domain_uniffi_contract_version()
     if bindings_contract_version != scaffolding_contract_version {
         return InitializationResult.contractVersionMismatch
     }
-    if (uniffi_user_domain_checksum_method_getusersusecaseimpl_execute() != 15443) {
+    if (uniffi_user_domain_checksum_method_getusersusecaseimpl_execute() != 13647) {
         return InitializationResult.apiChecksumMismatch
     }
-    if (uniffi_user_domain_checksum_method_getusersusecaseimpl_execute_by_id() != 32603) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_user_domain_checksum_method_getusersusecaseimpl_to_error_display() != 39373) {
-        return InitializationResult.apiChecksumMismatch
-    }
-    if (uniffi_user_domain_checksum_constructor_getusersusecaseimpl_new() != 46661) {
+    if (uniffi_user_domain_checksum_constructor_getusersusecaseimpl_new() != 39125) {
         return InitializationResult.apiChecksumMismatch
     }
 

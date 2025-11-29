@@ -6,31 +6,13 @@ pub struct ErrorDisplay {
     pub subtitle: String,
 }
 
-impl ErrorDisplay {
-    /// Create a repository/network error
-    pub fn repository() -> Self {
-        Self {
-            title: "Network Error".to_string(),
-            subtitle: "Please check your internet connection and try again.".to_string(),
-        }
-    }
-
-    /// Create a business logic error with custom message
-    pub fn business_logic(message: String) -> Self {
-        Self {
-            title: "Error".to_string(),
-            subtitle: message,
-        }
-    }
-
-    /// Create a generic error
-    pub fn generic() -> Self {
-        Self {
-            title: "Something Went Wrong".to_string(),
-            subtitle: "An unexpected error occurred. Please try again.".to_string(),
-        }
-    }
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct EpmtyDataModel {
+    pub title: String,
+    pub subtitle: String,
+    pub button_title: String
 }
+
 
 /// Simplified error type for domain operations exposed via UniFFI
 /// Uses enum for UniFFI compatibility (Records can't be used as error types in Result)
@@ -55,5 +37,4 @@ impl DomainError {
         }
     }
 }
-
 

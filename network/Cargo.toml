@@ -8,9 +8,10 @@ license = "MIT"
 [dependencies]
 # Async HTTP client
 # Disable default features (cookies, gzip, brotli, etc.) to reduce size
-# Enable minimal features needed: native-tls (TLS + HTTP/1.1), json (JSON parsing)
-# Note: native-tls includes HTTP/1.1 support. We avoid http2, gzip, brotli, cookies to save size
-reqwest = { version = "0.12", default-features = false, features = ["native-tls", "json"] }
+# Use rustls-tls instead of native-tls for cross-compilation compatibility (Android/iOS)
+# rustls is pure Rust, no OpenSSL dependency needed - works great for cross-compilation
+# Note: rustls-tls includes HTTP/1.1 support. We avoid http2, gzip, brotli, cookies to save size
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
 # Async runtime - minimal features
 # rt-multi-thread: reqwest needs multi-threaded runtime
 tokio = { version = "1", features = ["rt-multi-thread", "time"] }
