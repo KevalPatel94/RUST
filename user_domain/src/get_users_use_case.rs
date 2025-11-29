@@ -1,6 +1,6 @@
 use user_data::{UserRepository, UserRepositoryImpl};
-use crate::user_domain_model::UserListDomainModel;
-use crate::user_domain_record::UserDomainModel;
+use crate::user_list_domain_model::UserListDomainModel;
+use crate::user_domain_model::UserDomainModel;
 use domain_common::{BaseUseCase, DomainError, ErrorDisplay};
 use crate::user_data_to_domain_mapper::UserDataToDomainMapper;
 use std::sync::Arc;

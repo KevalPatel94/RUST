@@ -1,4 +1,4 @@
-use crate::user_domain_model::UserListDomainModel;
+use crate::user_list_domain_model::UserListDomainModel;
 use user_data::UserDataModel;
 
 /// Mapper to convert from Data layer models to Domain layer models

@@ -1,49 +1,30 @@
-/// Domain models - Pure business entities with no external dependencies
-/// These models represent the core business logic and should NOT depend on:
-/// - Serialization libraries (serde)
-/// - Platform-specific types
-/// - Data layer types
-///
-/// Internal domain User entity (used internally, converted to UserDomainModel for UniFFI)
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct UserListDomainModel {
+use crate::user_list_domain_model::UserListDomainModel;
+
+/// UserDomainModel - exposed via UniFFI for platform use
+#[derive(Debug, Clone, uniffi::Record)]
+pub struct UserDomainModel {
     pub id: u64,
     pub first_name: String,
     pub last_name: String,
     pub email: String,
     pub phone: String,
     pub age: u32,
-    pub full_name: String, // Computed/derived field
-    pub image_url: String, // User avatar/image URL
+    pub full_name: String,
+    pub image_url: String,
 }
 
-impl UserListDomainModel {
-    /// Create a new domain User
-    pub fn new(
-        id: u64,
-        first_name: String,
-        last_name: String,
-        email: String,
-        phone: String,
-        age: u32,
-        image_url: String,
-    ) -> Self {
-        let full_name = format!("{} {}", first_name, last_name);
+impl From<UserListDomainModel> for UserDomainModel {
+    fn from(domain: UserListDomainModel) -> Self {
         Self {
-            id,
-            first_name,
-            last_name,
-            email,
-            phone,
-            age,
-            full_name,
-            image_url,
+            id: domain.id,
+            first_name: domain.first_name,
+            last_name: domain.last_name,
+            email: domain.email,
+            phone: domain.phone,
+            age: domain.age,
+            full_name: domain.full_name,
+            image_url: domain.image_url,
         }
-    }
-
-    /// Get the user's display name
-    pub fn display_name(&self) -> &str {
-        &self.full_name
     }
 }
 
