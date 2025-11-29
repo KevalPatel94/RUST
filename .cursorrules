@@ -1,0 +1,412 @@
+# LockSmith Rust + UniFFI Architecture Rules
+
+## 🎯 Core Architecture Principles
+
+### 1. Strict 1:1:1 Relationship (CRITICAL)
+- **1 Screen = 1 ViewModel = 1 UseCase** (never share UseCases)
+- Each screen gets its own dedicated UseCase
+- ❌ NEVER share a UseCase across multiple screens
+- ❌ NEVER have multiple UseCases for one screen
+- ✅ Each ViewModel uses exactly one UseCase
+
+**Example:**
+```
+UserListScreen → UserListViewModel → GetUsersUseCaseImpl
+UserDetailScreen → UserDetailViewModel → GetUserDetailUseCaseImpl
+```
+
+### 2. Repository Pattern (CRITICAL)
+- **ALL reusable logic MUST live in Repository** (Data Layer)
+- ✅ API calls, HTTP requests, JSON parsing
+- ✅ Retry logic, caching, data transformation
+- ✅ Network error handling
+- ❌ Business rules belong in UseCase, NOT Repository
+- ❌ Screen-specific validation belongs in UseCase
+
+### 3. Layer Dependencies (One Direction Only)
+```
+Platform → Domain → Data → Network
+```
+- Platform code depends on Domain
+- Domain depends on Data
+- Data depends on Network
+- Never reverse dependencies
+
+## 🏗️ Code Organization
+
+### Crate Structure
+```
+locksmith/              # Root crate (UniFFI exports)
+├── domain_common/      # Shared domain infrastructure (BaseUseCase, ErrorDisplay)
+├── user_domain/        # User domain layer (UseCases, Domain Models)
+├── user_data/          # User data layer (Repositories, Data Models)
+├── network/            # Network layer (HTTP client)
+└── repository_common/  # Repository utilities
+```
+
+### File Naming Conventions
+- UseCases: `{feature}_use_case.rs` (e.g., `get_users_use_case.rs`)
+- Repositories: `{feature}_repository.rs` (e.g., `user_repository.rs`)
+- Domain Models: `{feature}_domain_model.rs` (e.g., `user_domain_model.rs`)
+- Data Models: `{feature}_data_model.rs` (e.g., `user_data_model.rs`)
+- Mappers: `{feature}_data_to_domain_mapper.rs`
+
+## 🔌 UniFFI Patterns
+
+### Exporting Functions
+```rust
+// ✅ GOOD: Core function + conditional UniFFI export
+pub fn add(a: u64, b: u64) -> u64 {
+    a + b
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+mod uniffi_exports {
+    use super::*;
+    
+    #[uniffi::export]
+    pub fn add(a: u64, b: u64) -> u64 {
+        crate::add(a, b)
+    }
+}
+```
+
+### Exporting Objects (UseCases)
+```rust
+#[derive(uniffi::Object)]
+pub struct GetUsersUseCaseImpl {
+    base: BaseUseCase,
+    user_repository: Arc<dyn UserRepository>,
+}
+
+#[uniffi::export]
+impl GetUsersUseCaseImpl {
+    #[uniffi::constructor]
+    pub fn new() -> Arc<Self> {
+        // Implementation
+    }
+    
+    pub async fn execute(&self) -> UserDomainResultModel {
+        // Implementation
+    }
+}
+```
+
+### Exporting Records (Domain Models)
+```rust
+#[derive(Debug, Clone)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
+pub struct UserDomainModel {
+    pub id: u64,
+    pub full_name: String,
+    pub email_display: String,  // Pre-formatted user-facing string
+    pub age_display: String,    // Pre-formatted user-facing string
+    // ... other fields
+}
+```
+
+### Exporting Enums (Result Models)
+```rust
+#[derive(Debug, Clone)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Enum))]
+pub enum UserDomainResultModel {
+    Loaded { data: Vec<UserDomainModel> },
+    Empty { data: EpmtyDataModel },
+    Error { display: ErrorDisplay },
+}
+```
+
+## 🌐 Platform-Specific Code (WASM vs Native)
+
+### Conditional Compilation Rules
+- **UniFFI**: Only for native platforms (Android/iOS/Python)
+- **WASM**: Uses `wasm-bindgen` directly in `wasm.rs`
+- **Conditional Attributes**: Use `#[cfg_attr(not(target_arch = "wasm32"), ...)]` for UniFFI attributes
+
+### Pattern for Dual Platform Support
+```rust
+// Core function (available to both)
+pub fn my_function() -> String {
+    "Hello".to_string()
+}
+
+// UniFFI export (native only)
+#[cfg(not(target_arch = "wasm32"))]
+mod uniffi_exports {
+    #[uniffi::export]
+    pub fn my_function() -> String {
+        crate::my_function()
+    }
+}
+
+// WASM export (wasm.rs)
+#[cfg(all(target_arch = "wasm32", feature = "js"))]
+mod wasm_bindings {
+    #[wasm_bindgen]
+    pub fn my_function() -> String {
+        crate::my_function()
+    }
+}
+```
+
+### Dependencies in Cargo.toml
+```toml
+# Common dependencies
+[dependencies]
+domain_common = { path = "domain_common" }
+
+# Native-only dependencies
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+uniffi = { version = "0.30.0" }
+user_domain = { path = "user_domain" }
+tokio = { version = "1", features = ["rt-multi-thread", "time"] }
+
+# WASM-only dependencies
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+tokio = { version = "1", features = ["rt", "time"] }
+```
+
+## 📦 Error Handling Patterns
+
+### DomainResultModel Pattern
+All UseCases return a `DomainResultModel` with three states:
+```rust
+pub enum UserDomainResultModel {
+    Loaded { data: Vec<UserDomainModel> },  // Success with data
+    Empty { data: EpmtyDataModel },          // Success but empty
+    Error { display: ErrorDisplay },         // Error occurred
+}
+```
+
+### ErrorDisplay (Platform-Friendly Errors)
+```rust
+#[derive(Debug, Clone)]
+#[cfg_attr(not(target_arch = "wasm32"), derive(uniffi::Record))]
+pub struct ErrorDisplay {
+    pub title: String,      // User-facing error title
+    pub subtitle: String,   // User-facing error message
+}
+```
+
+### UseCase Error Handling
+```rust
+pub async fn execute(&self) -> UserDomainResultModel {
+    let result = self.base.execute_async(async move {
+        // Repository call
+        repository.get_users()
+            .await
+            .map_err(|e| {
+                eprintln!("Repository error: {:?}", e);
+                ErrorDisplay {
+                    title: "Network Error".to_string(),
+                    subtitle: "Please check your internet connection.".to_string(),
+                }
+            })?;
+        Ok(users)
+    }).await;
+
+    match result {
+        Ok(users) => {
+            if users.is_empty() {
+                UserDomainResultModel::Empty { data: empty_data }
+            } else {
+                UserDomainResultModel::Loaded { data: users }
+            }
+        }
+        Err(error) => {
+            UserDomainResultModel::Error { display: error.to_display() }
+        }
+    }
+}
+```
+
+## 🎨 Domain Model Patterns
+
+### User-Facing Strings in Rust
+- **ALL user-facing strings MUST be generated in Rust**
+- Domain models include pre-formatted display strings
+- Platforms consume pre-formatted strings directly
+
+```rust
+pub struct UserDomainModel {
+    pub id: u64,
+    pub full_name: String,           // "John Doe"
+    pub email_display: String,       // "Email: john@example.com"
+    pub age_display: String,         // "25 years old"
+    // ❌ DON'T include raw email/age - only display strings
+}
+```
+
+### Mapper Pattern
+```rust
+impl UserDataToDomainMapper {
+    pub fn map(data_user: &UserDataModel) -> UserDomainModel {
+        let full_name = format!("{} {}", data_user.first_name, data_user.last_name);
+        let age_display = format!("{} years old", data_user.age);
+        let email_display = format!("Email: {}", data_user.email);
+        
+        UserDomainModel {
+            id: data_user.id,
+            full_name,
+            age_display,
+            email_display,
+            // ...
+        }
+    }
+}
+```
+
+## ⚡ Async Patterns
+
+### BaseUseCase Pattern
+All UseCases use `BaseUseCase` for async runtime management:
+```rust
+pub struct GetUsersUseCaseImpl {
+    base: BaseUseCase,  // Handles tokio runtime
+    user_repository: Arc<dyn UserRepository>,
+}
+
+impl GetUsersUseCaseImpl {
+    pub async fn execute(&self) -> UserDomainResultModel {
+        let repository = Arc::clone(&self.user_repository);
+        
+        let result = self.base.execute_async(async move {
+            // Your async logic here
+            repository.get_users().await.map_err(|e| {
+                ErrorDisplay { /* ... */ }
+            })?;
+            Ok(users)
+        }).await;
+        
+        // Handle result
+    }
+}
+```
+
+### Async Function Requirements
+- All async functions exposed via UniFFI must return `Send` futures
+- Use `Arc` for shared state across async boundaries
+- Use `BaseUseCase::execute_async` for error handling
+
+## 📝 Code Style Guidelines
+
+### UseCase Implementation
+```rust
+/// {Feature}UseCaseImpl - directly exposed via UniFFI for platform use
+/// Uses BaseUseCase for common runtime and error handling concerns
+#[derive(uniffi::Object)]
+pub struct GetUsersUseCaseImpl {
+    base: BaseUseCase,
+    repository: Arc<dyn UserRepository>,
+}
+
+#[uniffi::export]
+impl GetUsersUseCaseImpl {
+    /// Constructor - creates a new instance using BaseUseCase
+    #[uniffi::constructor]
+    pub fn new() -> Arc<Self> {
+        // Implementation
+    }
+    
+    /// Execute the use case
+    /// Returns DomainResultModel with Loaded, Empty, or Error state
+    pub async fn execute(&self) -> UserDomainResultModel {
+        // Implementation
+    }
+}
+```
+
+### Repository Implementation
+```rust
+#[async_trait]
+pub trait UserRepository {
+    async fn get_users(&self) -> Result<UsersResponse, UserRepositoryError>;
+}
+
+pub struct UserRepositoryImpl {
+    http_client: Arc<dyn HttpClient>,
+}
+
+impl UserRepositoryImpl {
+    pub fn new() -> Result<Self, UserRepositoryError> {
+        // Initialize HTTP client
+    }
+}
+
+#[async_trait]
+impl UserRepository for UserRepositoryImpl {
+    async fn get_users(&self) -> Result<UsersResponse, UserRepositoryError> {
+        // HTTP request logic
+        // JSON parsing
+        // Error handling
+        // Retry logic (if needed)
+    }
+}
+```
+
+## 🚫 Anti-Patterns (NEVER DO THIS)
+
+### ❌ Sharing UseCases
+```rust
+// BAD: Multiple screens using same UseCase
+UserListScreen → GetUsersUseCase
+UserSearchScreen → GetUsersUseCase  // ❌ WRONG
+```
+
+### ❌ Business Logic in Repository
+```rust
+// BAD: Business rule in Repository
+impl UserRepositoryImpl {
+    async fn get_users(&self) -> Result<Users> {
+        if user_id == 0 {  // ❌ Business rule - belongs in UseCase
+            return Err(...);
+        }
+    }
+}
+```
+
+### ❌ Platform-Specific Formatting
+```rust
+// BAD: Platform formats strings
+// Android: "Email: \(email)"
+// iOS: "Email: \(email)"
+// ❌ Should be: Rust generates "Email: \(email)"
+```
+
+### ❌ Raw UniFFI Exports in WASM Builds
+```rust
+// BAD: UniFFI export without conditional
+#[uniffi::export]  // ❌ Will fail on WASM
+pub fn my_function() { }
+```
+
+## ✅ Best Practices
+
+1. **Always use `BaseUseCase`** for async operations
+2. **Always return `DomainResultModel`** from UseCases (not `Result`)
+3. **Always generate user-facing strings in Rust** (not on platforms)
+4. **Always use conditional compilation** for UniFFI attributes
+5. **Always document UseCase purpose** in doc comments
+6. **Always handle errors** and convert to `ErrorDisplay`
+7. **Always use `Arc`** for shared state in async contexts
+
+## 🔍 When Adding New Features
+
+1. Create new UseCase in `{feature}_domain/src/{feature}_use_case.rs`
+2. Create new Repository in `{feature}_data/src/{feature}_repository.rs`
+3. Create Domain Model with pre-formatted strings
+4. Create Data Model matching API structure
+5. Create Mapper from Data → Domain
+6. Export UseCase via UniFFI in `src/lib.rs`
+7. Add to UDL file `src/my_crate.udl`
+8. Update platform ViewModels to use new UseCase
+
+## 📚 Key Files Reference
+
+- **Architecture**: `ARCHITECTURE.md`
+- **UniFFI UDL**: `src/my_crate.udl`
+- **Build Script**: `src/build.rs`
+- **WASM Exports**: `src/wasm.rs`
+- **Base UseCase**: `domain_common/src/base_use_case.rs`
+- **Error Types**: `domain_common/src/domain_error.rs`
+
