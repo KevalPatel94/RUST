@@ -3,7 +3,7 @@
 /// - Serialization libraries (serde)
 /// - Platform-specific types
 /// - Data layer types
-
+///
 /// Internal domain User entity (used internally, converted to UserDomainModel for UniFFI)
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UserListDomainModel {
@@ -14,6 +14,7 @@ pub struct UserListDomainModel {
     pub phone: String,
     pub age: u32,
     pub full_name: String, // Computed/derived field
+    pub image_url: String, // User avatar/image URL
 }
 
 impl UserListDomainModel {
@@ -25,6 +26,7 @@ impl UserListDomainModel {
         email: String,
         phone: String,
         age: u32,
+        image_url: String,
     ) -> Self {
         let full_name = format!("{} {}", first_name, last_name);
         Self {
@@ -35,6 +37,7 @@ impl UserListDomainModel {
             phone,
             age,
             full_name,
+            image_url,
         }
     }
 

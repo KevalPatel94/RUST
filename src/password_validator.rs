@@ -14,7 +14,7 @@ pub enum PasswordValidation {
   Valid
 }
 
-#[derive(uniffi::Object)]
+#[derive(uniffi::Object, Default)]
 pub struct PasswordValidator {}
 
 #[uniffi::export]
@@ -22,7 +22,7 @@ impl PasswordValidator {
 
     #[uniffi::constructor]
     pub fn new() -> Self {
-        PasswordValidator {  }
+        Self::default()
     }
 
 pub fn validate_with_message(&self, password: String) -> String {

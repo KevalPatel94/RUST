@@ -177,6 +177,17 @@ final class UserListViewControllerRx: UIViewController {
 
 // MARK: - User Table View Cell
 private final class UserTableViewCell: UITableViewCell {
+    private let avatarImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 25
+        imageView.backgroundColor = .systemGray5
+        imageView.tintColor = .systemGray
+        return imageView
+    }()
+    
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .headline)
@@ -210,13 +221,21 @@ private final class UserTableViewCell: UITableViewCell {
     }
     
     private func setupUI() {
+        contentView.addSubview(avatarImageView)
         contentView.addSubview(nameLabel)
         contentView.addSubview(emailLabel)
         contentView.addSubview(ageLabel)
         
         NSLayoutConstraint.activate([
+            // Avatar image view
+            avatarImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            avatarImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            avatarImageView.widthAnchor.constraint(equalToConstant: 50),
+            avatarImageView.heightAnchor.constraint(equalToConstant: 50),
+            
+            // Labels
             nameLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            nameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            nameLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 12),
             nameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             
             emailLabel.topAnchor.constraint(equalTo: nameLabel.bottomAnchor, constant: 4),
@@ -233,6 +252,7 @@ private final class UserTableViewCell: UITableViewCell {
         nameLabel.text = user.displayName
         emailLabel.text = user.email
         ageLabel.text = user.ageDisplay
+        avatarImageView.loadImage(from: user.imageUrl)
     }
 }
 

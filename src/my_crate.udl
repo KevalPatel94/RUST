@@ -28,6 +28,7 @@ record UserDomainModel {
     string phone;
     u32 age;
     string full_name;
+    string image_url;
 }
 
 object GetUsersUseCaseImpl {

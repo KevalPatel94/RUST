@@ -14,6 +14,8 @@
 		384DAA3424F92340BD497F55 /* UserListViewModelRx.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CB7003D269C685083A04C6 /* UserListViewModelRx.swift */; };
 		4023B8B1CF865EFF5CA146AB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */; };
 		501B1CFAF94B1F1E58624E66 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B026D97C8225C6FB9997BBD1 /* RxSwift */; };
+		555F98514E57766273D84883 /* LazyAsyncImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAE13F4597BB93683726E534 /* LazyAsyncImage.swift */; };
+		5EBA6253A5D31D3790266C2E /* UIImageView+LazyLoad.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3C210F99CE483E89F0EB2A5B /* UIImageView+LazyLoad.swift */; };
 		71EE16B015BCBED9325AF3DD /* DebugViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB56A698052A5B50C6293C8 /* DebugViewController.swift */; };
 		816C34456B6CDECACD683196 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 4E42556739CFEF72A9DECE37 /* RxCocoa */; };
 		8267514DB127FF00122758F8 /* UserListViewSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */; };
@@ -46,11 +48,13 @@
 		21D6104415BE7DD76A140E04 /* LockSmithExampleUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockSmithExampleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E3F8A25A25B8FC35209ADF6 /* ios */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ios; path = .; sourceTree = SOURCE_ROOT; };
 		3B96384A58B59297D9BD79ED /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3C210F99CE483E89F0EB2A5B /* UIImageView+LazyLoad.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+LazyLoad.swift"; sourceTree = "<group>"; };
 		436BDEA3B038FB1AC4E58B41 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4A4435EE70AB7CC9880E6578 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewSwiftUI.swift; sourceTree = "<group>"; };
 		66780219EBDB7EECD7087AB6 /* LockSmithExample.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LockSmithExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A89672093BACCCC7531C628B /* UserListViewControllerRx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserListViewControllerRx.swift; sourceTree = "<group>"; };
+		AAE13F4597BB93683726E534 /* LazyAsyncImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyAsyncImage.swift; sourceTree = "<group>"; };
 		B4E8B6B00E4B4E1E374A9C76 /* PasswordValidatorBenchmarkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordValidatorBenchmarkTests.swift; sourceTree = "<group>"; };
 		BA2D92CE7B5ECEFE55D08A4B /* LockSmithExampleUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockSmithExampleUITests.swift; sourceTree = "<group>"; };
 		C1EF30BDD5D041D8F9E183D4 /* LockSmithExampleTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LockSmithExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -151,6 +155,8 @@
 		52CB41D29DA167FAB327554A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				AAE13F4597BB93683726E534 /* LazyAsyncImage.swift */,
+				3C210F99CE483E89F0EB2A5B /* UIImageView+LazyLoad.swift */,
 				57D4613D215189144B1F3AEE /* UserListViewSwiftUI.swift */,
 			);
 			path = Views;
@@ -355,6 +361,8 @@
 			files = (
 				4023B8B1CF865EFF5CA146AB /* AppDelegate.swift in Sources */,
 				71EE16B015BCBED9325AF3DD /* DebugViewController.swift in Sources */,
+				555F98514E57766273D84883 /* LazyAsyncImage.swift in Sources */,
+				5EBA6253A5D31D3790266C2E /* UIImageView+LazyLoad.swift in Sources */,
 				E77EA6816C891D31A1E4788B /* UserListViewControllerRx.swift in Sources */,
 				384DAA3424F92340BD497F55 /* UserListViewModelRx.swift in Sources */,
 				9BF0547005B743477D46C446 /* UserListViewModelSwiftUI.swift in Sources */,

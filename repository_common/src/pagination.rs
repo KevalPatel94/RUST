@@ -13,17 +13,19 @@ impl PaginationParams {
         Self { page, limit }
     }
 
-    /// Default pagination (page 1, limit 20)
-    pub fn default() -> Self {
-        Self { page: 1, limit: 20 }
-    }
-
     /// Convert to query parameters for HTTP requests
     pub fn to_query_params(&self) -> Vec<(String, String)> {
         vec![
             ("page".to_string(), self.page.to_string()),
             ("limit".to_string(), self.limit.to_string()),
         ]
+    }
+}
+
+impl Default for PaginationParams {
+    /// Default pagination (page 1, limit 20)
+    fn default() -> Self {
+        Self { page: 1, limit: 20 }
     }
 }
 

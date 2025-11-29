@@ -10,6 +10,7 @@ pub struct UserDomainModel {
     pub phone: String,
     pub age: u32,
     pub full_name: String,
+    pub image_url: String,
 }
 
 impl From<UserListDomainModel> for UserDomainModel {
@@ -22,6 +23,7 @@ impl From<UserListDomainModel> for UserDomainModel {
             phone: domain.phone,
             age: domain.age,
             full_name: domain.full_name,
+            image_url: domain.image_url,
         }
     }
 }

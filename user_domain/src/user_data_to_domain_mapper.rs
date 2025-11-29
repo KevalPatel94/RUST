@@ -18,6 +18,7 @@ impl UserDataToDomainMapper {
             data_user.email.clone(),
             data_user.phone.clone(),
             data_user.age,
+            data_user.image.clone(),
         )
     }
 

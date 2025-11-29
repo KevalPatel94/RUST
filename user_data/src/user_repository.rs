@@ -32,7 +32,7 @@ impl UserRepositoryImpl {
     /// Create a new UserRepositoryImpl using shared repository helpers
     pub fn new() -> Result<Self, UserRepositoryError> {
         let client = HTTPClientImpl::new()
-            .map_err(|e| RepositoryCommonError::Network(e))?;
+            .map_err(RepositoryCommonError::Network)?;
         let helper = HttpRepositoryHelper::new(
             client,
             "https://dummyjson.com".to_string(),

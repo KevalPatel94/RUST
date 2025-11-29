@@ -75,17 +75,36 @@ private struct UserRowView: View {
     let user: UserPresentationModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(user.displayName)
-                .font(.headline)
+        HStack(spacing: 12) {
+            // Lazy-loaded user avatar
+            LazyAsyncImage(url: user.imageUrl) {
+                $0
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } placeholder: {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .foregroundColor(.gray)
+            }
+            .frame(width: 50, height: 50)
+            .clipShape(Circle())
+            .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
             
-            Text(user.email)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            // User info
+            VStack(alignment: .leading, spacing: 4) {
+                Text(user.displayName)
+                    .font(.headline)
+                
+                Text(user.email)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                
+                Text(user.ageDisplay)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
             
-            Text(user.ageDisplay)
-                .font(.caption)
-                .foregroundColor(.white)
+            Spacer()
         }
         .padding(.vertical, 4)
     }

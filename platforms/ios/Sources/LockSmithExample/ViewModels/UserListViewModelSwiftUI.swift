@@ -48,7 +48,8 @@ final class UserListViewModelSwiftUI: ObservableObject {
                         email: domainUser.email,
                         phone: domainUser.phone,
                         age: domainUser.age,
-                        ageDisplay: "\(domainUser.age) years old"
+                        ageDisplay: "\(domainUser.age) years old",
+                        imageUrl: domainUser.imageUrl
                     )
                 }
                 

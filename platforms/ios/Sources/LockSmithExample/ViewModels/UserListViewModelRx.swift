@@ -49,7 +49,8 @@ final class UserListViewModelRx {
                                 email: domainUser.email,
                                 phone: domainUser.phone,
                                 age: domainUser.age,
-                                ageDisplay: "\(domainUser.age) years old"
+                                ageDisplay: "\(domainUser.age) years old",
+                                imageUrl: domainUser.imageUrl
                             )
                         }
                         await MainActor.run {
@@ -102,5 +103,6 @@ struct UserPresentationModel: Identifiable {
     let phone: String
     let age: UInt32
     let ageDisplay: String
+    let imageUrl: String
 }
 

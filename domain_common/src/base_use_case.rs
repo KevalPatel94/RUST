@@ -39,7 +39,7 @@ impl BaseUseCase {
             .map_err(|_| DomainError::Error {
                 display: ErrorDisplay::generic(),
             })?
-            .map_err(|e| DomainError::from(e))
+            .map_err(DomainError::from)
     }
 
     /// Execute an async operation that returns ErrorDisplay directly

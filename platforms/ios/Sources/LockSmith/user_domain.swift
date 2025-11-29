@@ -685,10 +685,11 @@ public struct UserDomainModel {
     public var phone: String
     public var age: UInt32
     public var fullName: String
+    public var imageUrl: String
 
     // Default memberwise initializers are never public by default, so we
     // declare one manually.
-    public init(id: UInt64, firstName: String, lastName: String, email: String, phone: String, age: UInt32, fullName: String) {
+    public init(id: UInt64, firstName: String, lastName: String, email: String, phone: String, age: UInt32, fullName: String, imageUrl: String) {
         self.id = id
         self.firstName = firstName
         self.lastName = lastName
@@ -696,6 +697,7 @@ public struct UserDomainModel {
         self.phone = phone
         self.age = age
         self.fullName = fullName
+        self.imageUrl = imageUrl
     }
 }
 
@@ -727,6 +729,9 @@ extension UserDomainModel: Equatable, Hashable {
         if lhs.fullName != rhs.fullName {
             return false
         }
+        if lhs.imageUrl != rhs.imageUrl {
+            return false
+        }
         return true
     }
 
@@ -738,6 +743,7 @@ extension UserDomainModel: Equatable, Hashable {
         hasher.combine(phone)
         hasher.combine(age)
         hasher.combine(fullName)
+        hasher.combine(imageUrl)
     }
 }
 
@@ -756,7 +762,8 @@ public struct FfiConverterTypeUserDomainModel: FfiConverterRustBuffer {
                 email: FfiConverterString.read(from: &buf), 
                 phone: FfiConverterString.read(from: &buf), 
                 age: FfiConverterUInt32.read(from: &buf), 
-                fullName: FfiConverterString.read(from: &buf)
+                fullName: FfiConverterString.read(from: &buf), 
+                imageUrl: FfiConverterString.read(from: &buf)
         )
     }
 
@@ -768,6 +775,7 @@ public struct FfiConverterTypeUserDomainModel: FfiConverterRustBuffer {
         FfiConverterString.write(value.phone, into: &buf)
         FfiConverterUInt32.write(value.age, into: &buf)
         FfiConverterString.write(value.fullName, into: &buf)
+        FfiConverterString.write(value.imageUrl, into: &buf)
     }
 }
 
