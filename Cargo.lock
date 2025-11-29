@@ -2020,6 +2020,8 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "domain_common",
+ "network",
+ "repository_common",
  "thiserror 1.0.69",
  "tokio",
  "uniffi",

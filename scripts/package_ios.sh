@@ -164,7 +164,6 @@ function package {
   # Show size summary
   printf "\n${bold}✓ Build complete!${reset}\n"
   printf "  Type: ${FRAMEWORK_TYPE}\n"
-  printf "  Size: $(du -sh "$output_dir/$framework" | cut -f1)\n"
   printf "  Location: $output_dir/$framework\n"
 }
 

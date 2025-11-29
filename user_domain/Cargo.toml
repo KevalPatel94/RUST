@@ -8,6 +8,10 @@ edition = "2021"
 user_data = { path = "../user_data" }
 # Domain common infrastructure
 domain_common = { path = "../domain_common" }
+# Repository common for error types
+repository_common = { path = "../repository_common" }
+# Network for error types in tests
+network = { path = "../network" }
 # Async trait support
 async-trait = "0.1"
 # Error handling

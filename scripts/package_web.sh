@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Resolve repository root relative to this script to avoid hard-coded paths
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="/Users/kevapatel/Developer/paypal/LockSmith"
 OUT_DIR="$REPO_ROOT/platforms/web/pkg"
 
 # Ensure wasm-pack is available
