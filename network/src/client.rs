@@ -75,8 +75,15 @@ pub struct HTTPClientImpl {
 
 impl HTTPClientImpl {
     /// Create a new HTTPClientImpl with default configuration
+    /// Configured for cross-platform compatibility (Android/iOS/Web)
     pub fn new() -> Result<Self> {
         let client = ReqwestClient::builder()
+            // Set reasonable timeout for mobile networks
+            .timeout(Duration::from_secs(30))
+            // Enable connection pooling for better performance
+            .pool_idle_timeout(Duration::from_secs(90))
+            // Set user agent for better compatibility
+            .user_agent("LockSmith/1.0")
             .build()
             .map_err(|e| NetworkError::ConnectionError(e.to_string()))?;
 

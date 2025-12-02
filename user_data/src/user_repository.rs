@@ -30,12 +30,20 @@ pub struct UserRepositoryImpl {
 
 impl UserRepositoryImpl {
     /// Create a new UserRepositoryImpl using shared repository helpers
+    /// Base URL can be configured via USER_API_BASE_URL environment variable
+    /// Defaults to "https://dummyjson.com" if not set
     pub fn new() -> Result<Self, UserRepositoryError> {
         let client = HTTPClientImpl::new()
             .map_err(RepositoryCommonError::Network)?;
+        
+        // Allow base URL to be configured via environment variable for flexibility
+        // Defaults to dummyjson.com which is a public API that works out of the box
+        let base_url = std::env::var("USER_API_BASE_URL")
+            .unwrap_or_else(|_| "https://dummyjson.com".to_string());
+        
         let helper = HttpRepositoryHelper::new(
             client,
-            "https://dummyjson.com".to_string(),
+            base_url,
         );
         Ok(Self { helper })
     }

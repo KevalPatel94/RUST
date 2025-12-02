@@ -45,11 +45,25 @@ impl GetUsersUseCaseImpl {
                 .await
                 .map_err(|e| {
                     // Preserve error information for debugging
-                    // In production, you might want to log this
                     eprintln!("Repository error: {:?}", e);
+                    
+                    // Extract error message for better user feedback
+                    let error_str = format!("{:?}", e);
+                    let subtitle = if error_str.contains("error sending request") || 
+                                      error_str.contains("ConnectionError") ||
+                                      error_str.contains("connection") {
+                        "Unable to connect to the server. Please check your internet connection.".to_string()
+                    } else if error_str.contains("TimeoutError") || error_str.contains("timeout") {
+                        "Request timed out. Please check your network connection.".to_string()
+                    } else if error_str.contains("HttpError") {
+                        "Server returned an error. Please try again later.".to_string()
+                    } else {
+                        "Network request failed. Please check your internet connection.".to_string()
+                    };
+                    
                     ErrorDisplay {
                         title: "Network Error".to_string(),
-                        subtitle: "Please check your internet connection and try again.".to_string(),
+                        subtitle,
                     }
                 })?;
             Ok::<Vec<UserDomainModel>, ErrorDisplay>(UserDataToDomainMapper::vec_map(&users_response.users))
@@ -89,7 +103,6 @@ mod tests {
     use async_trait::async_trait;
     use std::sync::Mutex;
     use std::sync::Arc;
-    use tokio::runtime::Runtime;
 
     // Mock repository for testing
     struct MockUserRepository {
