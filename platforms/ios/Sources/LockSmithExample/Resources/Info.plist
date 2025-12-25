@@ -44,25 +44,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSAppTransportSecurity</key>
-	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<false/>
-		<key>NSExceptionDomains</key>
-		<dict>
-			<key>dummyjson.com</key>
-			<dict>
-				<key>NSIncludesSubdomains</key>
-				<true/>
-				<key>NSExceptionAllowsInsecureHTTPLoads</key>
-				<false/>
-				<key>NSExceptionRequiresForwardSecrecy</key>
-				<true/>
-				<key>NSExceptionMinimumTLSVersion</key>
-				<string>TLSv1.2</string>
-			</dict>
-		</dict>
-	</dict>
 </dict>
 </plist>
 

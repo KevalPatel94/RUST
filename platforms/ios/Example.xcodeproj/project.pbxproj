@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -350,6 +350,7 @@
 				A7EAD2F5E02E7129EA7798C3 /* XCRemoteSwiftPackageReference "RxSwift" */,
 				C3931A35602C1F44F93BAFCD /* XCLocalSwiftPackageReference "." */,
 			);
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -548,10 +549,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
 				INFOPLIST_FILE = Sources/LockSmithExample/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.venmo.LockSmithExample;
 				REEXPORTED_FRAMEWORK_NAMES = "";
 				SDKROOT = iphoneos;
@@ -584,10 +582,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "${DEVELOPMENT_TEAM}";
 				INFOPLIST_FILE = Sources/LockSmithExample/Resources/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.venmo.LockSmithExample;
 				REEXPORTED_FRAMEWORK_NAMES = "";
 				SDKROOT = iphoneos;

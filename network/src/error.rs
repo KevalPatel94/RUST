@@ -43,31 +43,14 @@ impl std::error::Error for NetworkError {}
 
 impl From<reqwest::Error> for NetworkError {
     fn from(err: reqwest::Error) -> Self {
-        let error_msg = err.to_string();
-        
-        // Check for specific error patterns that indicate connection issues
-        // "error sending request" is common on mobile platforms when network is unavailable
-        if error_msg.contains("error sending request") 
-            || error_msg.contains("failed to connect")
-            || error_msg.contains("connection refused")
-            || error_msg.contains("network unreachable") {
-            NetworkError::ConnectionError(error_msg)
-        } else if err.is_timeout() {
-            NetworkError::TimeoutError(error_msg)
+        if err.is_timeout() {
+            NetworkError::TimeoutError(err.to_string())
         } else if err.is_connect() {
-            NetworkError::ConnectionError(error_msg)
+            NetworkError::ConnectionError(err.to_string())
         } else if err.is_request() {
-            NetworkError::RequestError(error_msg)
+            NetworkError::RequestError(err.to_string())
         } else {
-            // For unknown errors, check if they're likely connection-related
-            if error_msg.to_lowercase().contains("connection") 
-                || error_msg.to_lowercase().contains("network")
-                || error_msg.to_lowercase().contains("resolve")
-                || error_msg.to_lowercase().contains("dns") {
-                NetworkError::ConnectionError(error_msg)
-            } else {
-                NetworkError::Unknown(error_msg)
-            }
+            NetworkError::Unknown(err.to_string())
         }
     }
 }

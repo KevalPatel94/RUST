@@ -150,20 +150,10 @@ function package {
   printf "\n→ %s ${bold}%s${reset}...\n" "Placing framework in" "$output_dir"
   mv "$framework" "$output_dir"
   
-  # Helper function to convert bytes to MB
-  bytes_to_mb() {
-    local bytes=$1
-    if command -v bc >/dev/null 2>&1; then
-      echo "scale=2; $bytes / 1024 / 1024" | bc
-    else
-      # Fallback: use awk for floating point division
-      awk "BEGIN {printf \"%.2f\", $bytes / 1048576}"
-    fi
-  }
-  
-  # Show size summary
+  # Show summary
   printf "\n${bold}✓ Build complete!${reset}\n"
   printf "  Type: ${FRAMEWORK_TYPE}\n"
+  printf "  Size: $(du -sh "$output_dir/$framework" | cut -f1)\n"
   printf "  Location: $output_dir/$framework\n"
 }
 

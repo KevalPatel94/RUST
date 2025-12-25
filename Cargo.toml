@@ -1,7 +1,7 @@
 [workspace]
 members = [
     ".", "domain_common",
-    "network", "repository_common", "user_data", "user_domain",
+    "network", "repository_common", "user_data", "user_data_source", "user_domain",
 ]
 resolver = "2"
 

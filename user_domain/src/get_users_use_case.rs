@@ -47,23 +47,49 @@ impl GetUsersUseCaseImpl {
                     // Preserve error information for debugging
                     eprintln!("Repository error: {:?}", e);
                     
-                    // Extract error message for better user feedback
-                    let error_str = format!("{:?}", e);
-                    let subtitle = if error_str.contains("error sending request") || 
-                                      error_str.contains("ConnectionError") ||
-                                      error_str.contains("connection") {
-                        "Unable to connect to the server. Please check your internet connection.".to_string()
-                    } else if error_str.contains("TimeoutError") || error_str.contains("timeout") {
-                        "Request timed out. Please check your network connection.".to_string()
-                    } else if error_str.contains("HttpError") {
-                        "Server returned an error. Please try again later.".to_string()
-                    } else {
-                        "Network request failed. Please check your internet connection.".to_string()
-                    };
-                    
-                    ErrorDisplay {
-                        title: "Network Error".to_string(),
-                        subtitle,
+                    // Provide more specific error messages based on error type
+                    match &e {
+                        user_data::UserRepositoryError::Common(repo_err) => {
+                            match repo_err {
+                                repository_common::RepositoryCommonError::Network(net_err) => {
+                                    ErrorDisplay {
+                                        title: "Network Error".to_string(),
+                                        subtitle: format!("Unable to connect to server. Please check your internet connection. ({})", net_err),
+                                    }
+                                }
+                                repository_common::RepositoryCommonError::HttpError(status) => {
+                                    ErrorDisplay {
+                                        title: "Server Error".to_string(),
+                                        subtitle: format!("Server returned error code {}. Please try again later.", status),
+                                    }
+                                }
+                                repository_common::RepositoryCommonError::JsonParse(_) => {
+                                    ErrorDisplay {
+                                        title: "Data Error".to_string(),
+                                        subtitle: "Received invalid data from server. Please try again.".to_string(),
+                                    }
+                                }
+                                _ => {
+                                    ErrorDisplay {
+                                        title: "Network Error".to_string(),
+                                        subtitle: "Please check your internet connection and try again.".to_string(),
+                                    }
+                                }
+                            }
+                        }
+                        user_data::UserRepositoryError::DataSource(_) => {
+                            // Data source errors (wrapped, can't access inner details without dependency)
+                            ErrorDisplay {
+                                title: "Network Error".to_string(),
+                                subtitle: "Unable to fetch data. Please check your internet connection and try again.".to_string(),
+                            }
+                        }
+                        _ => {
+                            ErrorDisplay {
+                                title: "Error".to_string(),
+                                subtitle: format!("An error occurred: {}", e),
+                            }
+                        }
                     }
                 })?;
             Ok::<Vec<UserDomainModel>, ErrorDisplay>(UserDataToDomainMapper::vec_map(&users_response.users))

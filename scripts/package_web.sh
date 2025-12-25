@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="/Users/kevapatel/Developer/paypal/LockSmith"
+# Use the directory where the script is located, or current directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 OUT_DIR="$REPO_ROOT/platforms/web/pkg"
 
 # Ensure wasm-pack is available
