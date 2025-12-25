@@ -1,17 +1,21 @@
 [package]
-name = "user_data"
+name = "user_data_source"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# User data source for fetching data and models
-user_data_source = { path = "../user_data_source" }
-# Repository common helpers (for error types)
+# Network crate for HTTP client
+network = { path = "../network" }
+# Repository common helpers
 repository_common = { path = "../repository_common" }
 # Async trait support
 async-trait = "0.1"
 # Error handling
 thiserror = "1.0"
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["rt", "macros"] }
+

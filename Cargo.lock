@@ -2006,6 +2006,17 @@ name = "user_data"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "repository_common",
+ "thiserror 1.0.69",
+ "tokio",
+ "user_data_source",
+]
+
+[[package]]
+name = "user_data_source"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
  "network",
  "repository_common",
  "serde",
